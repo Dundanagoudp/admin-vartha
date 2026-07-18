@@ -130,6 +130,52 @@ export const PlayerEmpty = styled.div`
   }
 `;
 
+export const ThumbPlay = styled.button`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: #000;
+
+  img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none;
+    object-fit: cover;
+    display: block;
+    opacity: 0.92;
+  }
+
+  .play-btn {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.28);
+  }
+
+  .play-btn span {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: #ff0033;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  &:hover .play-btn span {
+    transform: scale(1.05);
+  }
+`;
+
 export const MetaRow = styled.div`
   display: flex;
   align-items: center;

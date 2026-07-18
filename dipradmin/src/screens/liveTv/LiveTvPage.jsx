@@ -33,6 +33,7 @@ import {
   PlayerEmpty,
   MetaRow,
   Hint,
+  ThumbPlay,
 } from "./LiveTvPage.Styles";
 
 const { Title, Text } = Typography;
@@ -76,15 +77,24 @@ export default function LiveTvPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [current, setCurrent] = useState(null);
+  const [playerActive, setPlayerActive] = useState(false);
   const watchedUrl = Form.useWatch("playbackUrl", form);
   const previewId = useMemo(
-    () => extractYoutubeId(watchedUrl || current?.youtubeVideoId || ""),
+    () =>
+      extractYoutubeId(watchedUrl || "") ||
+      current?.youtubeVideoId ||
+      "",
     [watchedUrl, current?.youtubeVideoId]
   );
+
+  useEffect(() => {
+    setPlayerActive(false);
+  }, [previewId]);
 
   const embedUrl = useMemo(() => {
     if (!previewId) return "";
     const params = new URLSearchParams({
+      autoplay: "1",
       rel: "0",
       modestbranding: "1",
       playsinline: "1",
@@ -199,11 +209,6 @@ export default function LiveTvPage() {
             <Tag color={isOnline ? "red" : "default"}>
               {isOnline ? "LIVE ON WEBSITE" : "OFFLINE"}
             </Tag>
-            {current?.youtubeVideoId ? (
-              <Tag icon={<YoutubeOutlined />} color="processing">
-                {current.youtubeVideoId}
-              </Tag>
-            ) : null}
           </StatusRow>
 
           <Hint>
@@ -273,7 +278,7 @@ export default function LiveTvPage() {
 
           <PlayerShell>
             {isOnline && previewId ? <LiveBadge>Live</LiveBadge> : null}
-            {previewId ? (
+            {previewId && playerActive ? (
               <iframe
                 key={previewId}
                 title="Live TV preview player"
@@ -282,6 +287,22 @@ export default function LiveTvPage() {
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"
               />
+            ) : previewId ? (
+              <ThumbPlay
+                type="button"
+                onClick={() => setPlayerActive(true)}
+                aria-label="Play live preview"
+              >
+                <img
+                  src={`https://i.ytimg.com/vi/${previewId}/hqdefault.jpg`}
+                  alt=""
+                />
+                <div className="play-btn">
+                  <span>
+                    <PlayCircleOutlined />
+                  </span>
+                </div>
+              </ThumbPlay>
             ) : (
               <PlayerEmpty>
                 <YoutubeOutlined className="empty-icon" />
@@ -295,9 +316,7 @@ export default function LiveTvPage() {
           <MetaRow>
             <div>
               {previewId ? (
-                <Text type="secondary">
-                  ID: <Text code>{previewId}</Text>
-                </Text>
+                <Text type="secondary">Stream ready in player</Text>
               ) : (
                 <Text type="secondary">No stream loaded</Text>
               )}

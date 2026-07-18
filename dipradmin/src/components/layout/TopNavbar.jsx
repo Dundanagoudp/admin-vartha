@@ -1,54 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Avatar, Breadcrumb, Button, Dropdown, Space, Typography } from "antd";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Avatar, Button, Dropdown, Space, Typography } from "antd";
+import { useNavigate } from "react-router-dom";
 import { Bell, ChevronDown, Menu, User } from "lucide-react";
 import { getUserProfile } from "../../service/Dashboard/Dashboardapi";
 import { TopNavbarRoot } from "./TopNavbar.styles";
 
 const { Text } = Typography;
 
-const TITLE_MAP = {
-  "/dashboard": "Dashboard",
-  "/manage-users": "Users",
-  "/manage-articles": "Articles",
-  "/manage-varthajanapada": "Vartha Janapada",
-  "/manage-marchofkarnataka": "March of Karnataka",
-  "/manage-shortvideos": "Short Videos",
-  "/manage-longvideo": "Long Videos",
-  "/manage-photos": "Photos",
-  "/website-pages": "Websites",
-  "/latestnotification": "Latest Notification",
-  "/ServiceNotification": "Our Services",
-  "/live-tv": "Live TV",
-  "/video-categories": "Video Categories",
-  "/photo-categories": "Photo Categories",
-  "/districts": "Districts",
-  "/manage-moderation": "Comments",
-  "/manage-category": "Categories",
-  "/manage-banners": "Banners",
-};
-
-function resolveTitle(pathname) {
-  if (TITLE_MAP[pathname]) return TITLE_MAP[pathname];
-  const match = Object.keys(TITLE_MAP).find((k) => pathname.startsWith(`${k}/`));
-  if (match) {
-    if (pathname.includes("/add") || pathname.includes("/create")) return `Add ${TITLE_MAP[match]}`;
-    if (pathname.includes("/edit") || pathname.includes("/update")) return `Edit ${TITLE_MAP[match]}`;
-    if (pathname.includes("/history")) return `${TITLE_MAP[match]} History`;
-    return TITLE_MAP[match];
-  }
-  return "Admin";
-}
-
 export default function TopNavbar({ onMenuClick }) {
-  const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const role = localStorage.getItem("role") || "officer";
-  const title = useMemo(
-    () => resolveTitle(location.pathname),
-    [location.pathname]
-  );
 
   useEffect(() => {
     let mounted = true;
@@ -61,11 +23,6 @@ export default function TopNavbar({ onMenuClick }) {
       mounted = false;
     };
   }, []);
-
-  const crumbItems = [
-    { title: <Link to="/dashboard">Home</Link> },
-    { title },
-  ];
 
   const menu = {
     items: [
@@ -100,9 +57,6 @@ export default function TopNavbar({ onMenuClick }) {
           onClick={onMenuClick}
           aria-label="Open menu"
         />
-        <div className="tn-titles">
-          <Breadcrumb items={crumbItems} className="tn-crumb" />
-        </div>
       </div>
 
       <div className="tn-right">

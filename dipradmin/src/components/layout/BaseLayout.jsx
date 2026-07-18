@@ -35,11 +35,13 @@ const BaseLayout = () => {
         <Content
           style={{
             margin: 16,
-            padding: 20,
+            padding: "20px 20px 28px",
             background: "#fff",
             borderRadius: 12,
             minHeight: "calc(100vh - 32px)",
             boxShadow: "0 1px 2px rgba(21, 29, 72, 0.04)",
+            overflowX: "auto",
+            width: "auto",
           }}
         >
           <Outlet />

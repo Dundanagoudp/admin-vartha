@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const RAW_BASE = import.meta.env.VITE_BASE_URL || "";
+const BASE_URL = String(RAW_BASE).replace(/\/+$/, "");
 
 function authHeaders() {
   const token = localStorage.getItem("token");
@@ -8,39 +9,52 @@ function authHeaders() {
   };
 }
 
+async function parseJsonResponse(response, fallbackMessage) {
+  let result = null;
+  try {
+    result = await response.json();
+  } catch (_) {
+    result = null;
+  }
+  if (!response.ok) {
+    throw new Error(result?.message || fallbackMessage);
+  }
+  return result;
+}
+
+/** GET current Live TV (existing URL + online status) */
 export const getLiveTv = async () => {
+  if (!BASE_URL) {
+    throw new Error("VITE_BASE_URL is not set");
+  }
   const response = await fetch(`${BASE_URL}/api/live-tv`, {
     method: "GET",
     headers: authHeaders(),
   });
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(result?.message || "Failed to fetch Live TV");
-  }
-  return result;
+  return parseJsonResponse(response, "Failed to fetch Live TV");
 };
 
+/** POST create/update Live TV (replace URL and set online) */
 export const upsertLiveTv = async (payload) => {
+  if (!BASE_URL) {
+    throw new Error("VITE_BASE_URL is not set");
+  }
   const response = await fetch(`${BASE_URL}/api/live-tv`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(payload),
   });
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(result?.message || "Failed to update Live TV");
-  }
-  return result;
+  return parseJsonResponse(response, "Failed to update Live TV");
 };
 
+/** POST go offline (keeps saved URL for next go-live) */
 export const setLiveTvOffline = async () => {
+  if (!BASE_URL) {
+    throw new Error("VITE_BASE_URL is not set");
+  }
   const response = await fetch(`${BASE_URL}/api/live-tv/offline`, {
-    method: "PATCH",
+    method: "POST",
     headers: authHeaders(),
   });
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(result?.message || "Failed to set Live TV offline");
-  }
-  return result;
+  return parseJsonResponse(response, "Failed to set Live TV offline");
 };

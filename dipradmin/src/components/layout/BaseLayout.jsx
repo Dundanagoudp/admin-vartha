@@ -2,53 +2,47 @@ import React from "react";
 import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar.jsx";
-import Header from "../header/Header.jsx";
 
 const { Sider, Content } = Layout;
 
 const BaseLayout = () => {
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      {/* Sidebar */}
+    <Layout style={{ minHeight: "100vh", background: "#f5f6fa" }}>
       <Sider
         width={260}
+        theme="light"
         style={{
-          // backgroundColor: "#2c3e50",
-           backgroundColor: "#fff",
+          background: "#fff",
           position: "fixed",
           top: 0,
           left: 0,
-          bottom: 0, // Ensure Sider stays fixed on the screen
-          // overflowY: "auto", // Allow scrolling in the sidebar if necessary
+          bottom: 0,
+          overflow: "hidden",
+          zIndex: 100,
+          boxShadow: "0 0 0 1px #eef0f4, 4px 0 24px rgba(21, 29, 72, 0.04)",
         }}
       >
         <Sidebar />
       </Sider>
 
-      {/* Main Content Area */}
       <Layout
         style={{
-          marginLeft: 260, // Offset content to make space for the sidebar
-          minHeight: "100vh", // Ensures the content area takes full height
+          marginLeft: 260,
+          minHeight: "100vh",
+          background: "#f5f6fa",
         }}
       >
-        {/* Header */}
-        {/* Add your header here if needed */}
-        {/* <Header /> */}
-
-        {/* Content */}
         <Content
           style={{
-            margin: "16px",
-            // overflowY: "auto", // Allow content area to scroll
-            padding: 24,
-            backgroundColor: "#fff",
-            minHeight: "calc(100vh - 64px)", // Adjust for the header height
+            margin: 16,
+            padding: 20,
+            background: "#fff",
+            borderRadius: 12,
+            minHeight: "calc(100vh - 32px)",
+            boxShadow: "0 1px 2px rgba(21, 29, 72, 0.04)",
           }}
         >
-          <div>
-            <Outlet />
-          </div>
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

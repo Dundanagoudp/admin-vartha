@@ -13,7 +13,8 @@ export const GlobalStyles = createGlobalStyle`
         font-weight: 400;
         font-size: 16px;
         line-height: 1.6;
-        background: #rgba(55, 23, 196, 0.3);};
+        background: #f5f6fa;
+        color: #151d48;
     }
 
     html {

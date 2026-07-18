@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Alert,
   Button,
-  Card,
   Form,
   Input,
+  Modal,
   Space,
   Tag,
   Typography,
@@ -21,8 +20,22 @@ import {
   setLiveTvOffline,
   upsertLiveTv,
 } from "../../service/liveTv/LiveTvService";
+import {
+  Page,
+  HeaderRow,
+  HeaderCopy,
+  StatusRow,
+  Grid,
+  Panel,
+  PlayerPanel,
+  PlayerShell,
+  LiveBadge,
+  PlayerEmpty,
+  MetaRow,
+  Hint,
+} from "./LiveTvPage.Styles";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 function extractYoutubeId(input) {
@@ -51,6 +64,13 @@ function extractYoutubeId(input) {
   return "";
 }
 
+function applyLiveTvToForm(form, data) {
+  form.setFieldsValue({
+    title: data?.title || "DIPR Live TV",
+    playbackUrl: data?.playbackUrl || "",
+  });
+}
+
 export default function LiveTvPage() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
@@ -58,9 +78,19 @@ export default function LiveTvPage() {
   const [current, setCurrent] = useState(null);
   const watchedUrl = Form.useWatch("playbackUrl", form);
   const previewId = useMemo(
-    () => extractYoutubeId(watchedUrl || ""),
-    [watchedUrl]
+    () => extractYoutubeId(watchedUrl || current?.youtubeVideoId || ""),
+    [watchedUrl, current?.youtubeVideoId]
   );
+
+  const embedUrl = useMemo(() => {
+    if (!previewId) return "";
+    const params = new URLSearchParams({
+      rel: "0",
+      modestbranding: "1",
+      playsinline: "1",
+    });
+    return `https://www.youtube.com/embed/${previewId}?${params.toString()}`;
+  }, [previewId]);
 
   const loadLiveTv = useCallback(async () => {
     setLoading(true);
@@ -68,10 +98,7 @@ export default function LiveTvPage() {
       const res = await getLiveTv();
       const data = res?.data || null;
       setCurrent(data);
-      form.setFieldsValue({
-        title: data?.title || "DIPR Live TV",
-        playbackUrl: data?.playbackUrl || "",
-      });
+      applyLiveTvToForm(form, data);
     } catch (error) {
       console.error(error);
       message.error(error.message || "Failed to load Live TV");
@@ -98,12 +125,14 @@ export default function LiveTvPage() {
         playbackUrl,
         isOnline: true,
       });
-      setCurrent(res?.data || null);
-      form.setFieldsValue({
-        title: res?.data?.title,
-        playbackUrl: res?.data?.playbackUrl,
-      });
-      message.success("Live TV is online — website will show this stream");
+      const data = res?.data || null;
+      setCurrent(data);
+      applyLiveTvToForm(form, data);
+      message.success(
+        current?.isOnline
+          ? "Live TV updated — website shows the new stream"
+          : "Live TV is online — website will show this stream"
+      );
     } catch (error) {
       console.error(error);
       message.error(error.message || "Failed to go live");
@@ -112,191 +141,188 @@ export default function LiveTvPage() {
     }
   };
 
-  const handleOffline = async () => {
-    setSaving(true);
-    try {
-      const res = await setLiveTvOffline();
-      setCurrent(res?.data || null);
-      message.success("Live TV is offline");
-    } catch (error) {
-      console.error(error);
-      message.error(error.message || "Failed to go offline");
-    } finally {
-      setSaving(false);
-    }
+  const handleOffline = () => {
+    Modal.confirm({
+      title: "Go offline?",
+      content:
+        "The website will stop showing Live TV. The saved URL stays so you can go live again.",
+      okText: "Go Offline",
+      okType: "danger",
+      cancelText: "Cancel",
+      centered: true,
+      onOk: async () => {
+        setSaving(true);
+        try {
+          const res = await setLiveTvOffline();
+          const data = res?.data || null;
+          setCurrent(data);
+          applyLiveTvToForm(form, data);
+          message.success("Live TV is offline");
+        } catch (error) {
+          console.error(error);
+          message.error(error.message || "Failed to go offline");
+          throw error;
+        } finally {
+          setSaving(false);
+        }
+      },
+    });
   };
 
   const isOnline = Boolean(current?.isOnline);
+  const hasSavedStream = Boolean(
+    current?.playbackUrl || current?.youtubeVideoId
+  );
 
   return (
-    <div style={{ minHeight: "100%", background: "#f6f7f9", padding: 24 }}>
-      <div style={{ maxWidth: 960, margin: "0 auto" }}>
-        <Space
-          style={{
-            width: "100%",
-            justifyContent: "space-between",
-            marginBottom: 16,
-          }}
-          wrap
+    <Page>
+      <HeaderRow>
+        <HeaderCopy>
+          <Title level={3}>Live TV</Title>
+          <Text type="secondary">
+            Paste a YouTube Live URL, preview it here, then publish to the
+            website.
+          </Text>
+        </HeaderCopy>
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={loadLiveTv}
+          loading={loading}
         >
-          <div>
-            <Title level={3} style={{ margin: 0 }}>
-              Live TV
-            </Title>
-            <Text type="secondary">
-              Paste a YouTube Live URL and publish it to the website.
-            </Text>
-          </div>
-          <Button icon={<ReloadOutlined />} onClick={loadLiveTv} loading={loading}>
-            Refresh
-          </Button>
-        </Space>
+          Refresh
+        </Button>
+      </HeaderRow>
 
-        <Alert
-          type="info"
-          showIcon
-          style={{ marginBottom: 16 }}
-          message="One YouTube stream at a time"
-          description="A new URL replaces the previous one. Click Go Offline when the live ends."
-        />
-
-        <div className="live-tv-grid">
-          <Card
-            loading={loading}
-            style={{
-              borderRadius: 12,
-              boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
-            }}
-          >
-            <Space style={{ marginBottom: 16 }} wrap>
-              <Tag color={isOnline ? "red" : "default"}>
-                {isOnline ? "LIVE ON WEBSITE" : "OFFLINE"}
+      <Grid>
+        <Panel>
+          <StatusRow>
+            <Tag color={isOnline ? "red" : "default"}>
+              {isOnline ? "LIVE ON WEBSITE" : "OFFLINE"}
+            </Tag>
+            {current?.youtubeVideoId ? (
+              <Tag icon={<YoutubeOutlined />} color="processing">
+                {current.youtubeVideoId}
               </Tag>
-              {current?.youtubeVideoId ? (
-                <Tag icon={<YoutubeOutlined />} color="processing">
-                  {current.youtubeVideoId}
-                </Tag>
-              ) : null}
-            </Space>
-
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={handleGoLive}
-              initialValues={{ title: "DIPR Live TV" }}
-            >
-              <Form.Item label="Title" name="title">
-                <Input placeholder="DIPR Live TV" maxLength={120} />
-              </Form.Item>
-
-              <Form.Item
-                label="YouTube Live URL"
-                name="playbackUrl"
-                rules={[{ required: true, message: "Paste YouTube live URL" }]}
-                extra="Example: https://www.youtube.com/live/XStXShPCViE"
-              >
-                <TextArea
-                  rows={3}
-                  placeholder="https://www.youtube.com/live/XXXXXXXXXXX"
-                />
-              </Form.Item>
-
-              <Space wrap>
-                <Button
-                  type="primary"
-                  danger
-                  htmlType="submit"
-                  icon={<PlayCircleOutlined />}
-                  loading={saving}
-                  size="large"
-                >
-                  Go Live
-                </Button>
-                <Button
-                  icon={<StopOutlined />}
-                  onClick={handleOffline}
-                  loading={saving}
-                  size="large"
-                  disabled={!isOnline && !current?.playbackUrl}
-                >
-                  Go Offline
-                </Button>
-              </Space>
-            </Form>
-          </Card>
-
-          <Card
-            title="Preview"
-            style={{
-              borderRadius: 12,
-              boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
-            }}
-          >
-            {previewId ? (
-              <>
-                <div className="live-tv-thumb">
-                  <img
-                    src={`https://i.ytimg.com/vi/${previewId}/hqdefault.jpg`}
-                    alt="YouTube thumbnail"
-                  />
-                </div>
-                <Paragraph style={{ marginBottom: 8 }}>
-                  Video ID: <Text code>{previewId}</Text>
-                </Paragraph>
-                <Button
-                  type="link"
-                  href={`https://www.youtube.com/watch?v=${previewId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  icon={<YoutubeOutlined />}
-                  style={{ paddingLeft: 0 }}
-                >
-                  Open on YouTube
-                </Button>
-              </>
-            ) : (
-              <Text type="secondary">
-                Paste a YouTube live URL to preview the thumbnail.
-              </Text>
-            )}
-
-            {current?.updatedAt ? (
-              <Paragraph type="secondary" style={{ marginTop: 16, marginBottom: 0 }}>
-                Last updated: {new Date(current.updatedAt).toLocaleString()}
-              </Paragraph>
             ) : null}
-          </Card>
-        </div>
-      </div>
+          </StatusRow>
 
-      <style>{`
-        .live-tv-grid {
-          display: grid;
-          grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-          gap: 16px;
-        }
-        .live-tv-thumb {
-          position: relative;
-          width: 100%;
-          padding-top: 56.25%;
-          background: #111;
-          border-radius: 8px;
-          overflow: hidden;
-          margin-bottom: 12px;
-        }
-        .live-tv-thumb img {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-        @media (max-width: 900px) {
-          .live-tv-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
-    </div>
+          <Hint>
+            One stream at a time. Update replaces the current URL. Go Offline
+            hides it on the site but keeps the URL saved.
+          </Hint>
+
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleGoLive}
+            initialValues={{ title: "DIPR Live TV", playbackUrl: "" }}
+            disabled={loading}
+          >
+            <Form.Item label="Title" name="title">
+              <Input placeholder="DIPR Live TV" maxLength={120} size="large" />
+            </Form.Item>
+
+            <Form.Item
+              label="YouTube Live URL"
+              name="playbackUrl"
+              rules={[{ required: true, message: "Paste YouTube live URL" }]}
+              extra="Example: https://www.youtube.com/live/XStXShPCViE"
+            >
+              <TextArea
+                rows={3}
+                placeholder="https://www.youtube.com/live/XXXXXXXXXXX"
+                style={{ resize: "vertical" }}
+              />
+            </Form.Item>
+
+            <Space wrap size="middle">
+              <Button
+                type="primary"
+                danger
+                htmlType="submit"
+                icon={<PlayCircleOutlined />}
+                loading={saving}
+                size="large"
+              >
+                {isOnline ? "Update & Go Live" : "Go Live"}
+              </Button>
+              <Button
+                icon={<StopOutlined />}
+                onClick={handleOffline}
+                loading={saving}
+                size="large"
+                disabled={!isOnline && !hasSavedStream}
+              >
+                Go Offline
+              </Button>
+            </Space>
+          </Form>
+        </Panel>
+
+        <PlayerPanel>
+          <StatusRow style={{ marginBottom: 12 }}>
+            <Text strong style={{ fontSize: 15 }}>
+              Live player
+            </Text>
+            {isOnline ? (
+              <Tag color="error">Broadcasting</Tag>
+            ) : (
+              <Tag>Preview only</Tag>
+            )}
+          </StatusRow>
+
+          <PlayerShell>
+            {isOnline && previewId ? <LiveBadge>Live</LiveBadge> : null}
+            {previewId ? (
+              <iframe
+                key={previewId}
+                title="Live TV preview player"
+                src={embedUrl}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            ) : (
+              <PlayerEmpty>
+                <YoutubeOutlined className="empty-icon" />
+                <Text style={{ color: "#c5cad6" }}>
+                  Paste a YouTube Live URL to play preview
+                </Text>
+              </PlayerEmpty>
+            )}
+          </PlayerShell>
+
+          <MetaRow>
+            <div>
+              {previewId ? (
+                <Text type="secondary">
+                  ID: <Text code>{previewId}</Text>
+                </Text>
+              ) : (
+                <Text type="secondary">No stream loaded</Text>
+              )}
+              {current?.updatedAt ? (
+                <div>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    Updated {new Date(current.updatedAt).toLocaleString()}
+                  </Text>
+                </div>
+              ) : null}
+            </div>
+            {previewId ? (
+              <Button
+                type="link"
+                href={`https://www.youtube.com/watch?v=${previewId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={<YoutubeOutlined />}
+              >
+                Open on YouTube
+              </Button>
+            ) : null}
+          </MetaRow>
+        </PlayerPanel>
+      </Grid>
+    </Page>
   );
 }

@@ -1,9 +1,10 @@
 import React from "react";
 import { ArticlePageWrapper } from "./ArticlePage.styles";
 import { Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ArticleTable from "../../components/articles/ArticleTable";
+import PageHeader from "../../components/ui/PageHeader";
 
 function ArticlePage() {
   const navigate = useNavigate();
@@ -14,17 +15,19 @@ function ArticlePage() {
 
   return (
     <ArticlePageWrapper>
-      <div className="header-section">
-        <div className="block-title">Manage Articles</div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          className="add-article-btn"
-          onClick={handleAddArticleClick}
-        >
-          Add Article
-        </Button>
-      </div>
+      <PageHeader
+        title="Manage Articles"
+        breadcrumbs={[{ title: "Articles" }]}
+        extra={
+          <Button
+            type="primary"
+            icon={<Plus size={16} />}
+            onClick={handleAddArticleClick}
+          >
+            Add Article
+          </Button>
+        }
+      />
 
       <div className="block-table">
         <ArticleTable />

@@ -24,6 +24,8 @@ import { getCategories } from "../../service/categories/CategoriesApi";
 import { getDistricts } from "../../service/districts/DistrictsApi";
 import moment from "moment/moment";
 import { uploadFileToAzureStorage } from "../../config/azurestorageservice";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -308,15 +310,21 @@ function EditArticlesPage() {
   }
 
   return (
-    <div
-      style={{
-        maxWidth: "80vw",
-        margin: "auto",
-        padding: "20px",
-        display: "flex",
-        gap: "20px",
-      }}
-    >
+    <div>
+      <PageHeader
+        title="Edit Article"
+        breadcrumbs={[
+          { title: "Articles", path: "/manage-articles" },
+          { title: "Edit Article" },
+        ]}
+      />
+      <FormCard>
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+        }}
+      >
       {/* LEFT - Image Upload */}
       <Card title="Article Image" style={{ width: "40%" }}>
         <Upload customRequest={handleUpload} showUploadList={false} accept="image/*">
@@ -506,6 +514,8 @@ function EditArticlesPage() {
           </Button>
         </Form>
       </Card>
+      </div>
+      </FormCard>
     </div>
   );
 }

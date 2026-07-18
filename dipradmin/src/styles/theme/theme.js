@@ -2,37 +2,58 @@ import { css } from "styled-components";
 
 export const theme = {
   colors: {
-    blue: "#5D5FEF",
-    seasalt: "#FAFBFC",
-    gray700: "#737791",
-    ashgray: "#a5aea3",
-    dodgerBlue: "#0095FF",
-    emerald: "#00E096",
-    red: "#EF4444",
-    violet: "#A700FF",
-    yellow: "#FFCF00",
-    pink: "#FA5A7D",
-    salmon: "#FF947A",
-    cadet: "#151D48",
-    malachite: "#3CD856",
-    floralWhite: "#FFFAF1",
-    orange: "#FFA412",
-    white: "#ffffff",
-    black: "#000000",
-    columbiaBlue: "#C3D3E2",
-    latte: "#FFF4DE",
+    primary: "#005BAC",
+    success: "#16A34A",
+    warning: "#F59E0B",
+    danger: "#DC2626",
+    background: "#F8FAFC",
+    card: "#FFFFFF",
+    border: "#E5E7EB",
+    text: "#111827",
+    textSecondary: "#6B7280",
+
+    // Legacy aliases used across older styled files
+    blue: "#005BAC",
+    seasalt: "#F8FAFC",
+    gray700: "#6B7280",
+    ashgray: "#9CA3AF",
+    dodgerBlue: "#005BAC",
+    emerald: "#16A34A",
+    red: "#DC2626",
+    violet: "#005BAC",
+    yellow: "#F59E0B",
+    pink: "#DC2626",
+    salmon: "#F59E0B",
+    cadet: "#111827",
+    malachite: "#16A34A",
+    floralWhite: "#F8FAFC",
+    orange: "#F59E0B",
+    white: "#FFFFFF",
+    black: "#111827",
+    columbiaBlue: "#E5E7EB",
+    latte: "#FEF3C7",
     nyanza: "#DCFCE7",
-    palePurple: "#F3E8FF",
-    mistyRose: "#FFE2E5",
-    sunset: "#FFD5A4",
-    mauve: "#C5A8FF",
-    aquamarine: "#8CFAC7",
-    aliceBlue: "#F0F9FF",
-    frenchGray: "#bdc9d3",
+    palePurple: "#DBEAFE",
+    mistyRose: "#FEE2E2",
+    sunset: "#FEF3C7",
+    mauve: "#BFDBFE",
+    aquamarine: "#BBF7D0",
+    aliceBlue: "#EFF6FF",
+    frenchGray: "#D1D5DB",
+  },
+
+  shadows: {
+    soft: "0 1px 2px rgba(17, 24, 39, 0.04), 0 4px 16px rgba(17, 24, 39, 0.06)",
+    card: "0 1px 3px rgba(17, 24, 39, 0.06), 0 8px 24px rgba(17, 24, 39, 0.04)",
+  },
+
+  radius: {
+    md: "12px",
+    sm: "8px",
   },
 
   typography: {
-    fontFamily: "'Public Sans', sans-serif",
+    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
   },
 
   breakpoints: {
@@ -46,7 +67,67 @@ export const theme = {
   },
 };
 
-// Reusable media query function
+export const antdTheme = {
+  token: {
+    colorPrimary: "#005BAC",
+    colorSuccess: "#16A34A",
+    colorWarning: "#F59E0B",
+    colorError: "#DC2626",
+    colorInfo: "#005BAC",
+    colorText: "#111827",
+    colorTextSecondary: "#6B7280",
+    colorBorder: "#E5E7EB",
+    colorBgLayout: "#F8FAFC",
+    colorBgContainer: "#FFFFFF",
+    borderRadius: 12,
+    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+    controlHeight: 40,
+    boxShadow: "0 1px 2px rgba(17, 24, 39, 0.04), 0 4px 16px rgba(17, 24, 39, 0.06)",
+  },
+  components: {
+    Button: {
+      controlHeight: 40,
+      borderRadius: 10,
+      fontWeight: 600,
+    },
+    Card: {
+      borderRadiusLG: 12,
+      paddingLG: 20,
+    },
+    Table: {
+      headerBg: "#F8FAFC",
+      headerColor: "#111827",
+      rowHoverBg: "#EFF6FF",
+      borderColor: "#E5E7EB",
+    },
+    Menu: {
+      itemBorderRadius: 10,
+      itemMarginInline: 8,
+      itemHeight: 44,
+      iconSize: 18,
+    },
+    Input: {
+      borderRadius: 10,
+      controlHeight: 40,
+    },
+    Select: {
+      borderRadius: 10,
+      controlHeight: 40,
+    },
+    Modal: {
+      borderRadiusLG: 12,
+    },
+    Tag: {
+      borderRadiusSM: 8,
+    },
+    Layout: {
+      siderBg: "#FFFFFF",
+      headerBg: "#FFFFFF",
+      bodyBg: "#F8FAFC",
+    },
+  },
+};
+
 export const media = {
   xxxl: (...args) => css`
     @media (max-width: ${(props) => props.theme.breakpoints.xxxl}) {

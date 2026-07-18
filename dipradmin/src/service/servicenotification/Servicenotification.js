@@ -66,18 +66,22 @@ export const listNewArticles = async (page = 1, page_size = 20) => {
   };
 };
 
-// Get New Article by ID (existing digi9 flow — unchanged for now)
+/** GET by id from our backend list (no digi9) */
 export const getNewArticleById = async (newarticle_id) => {
   try {
-    const response = await fetch(
-      `${LLM_URL}/api/newarticles/${newarticle_id}`,
-      {
-        method: "GET",
-        headers: authHeaders(),
-      }
-    );
-    const result = await response.json();
-    return result;
+    const list = await listNewArticles();
+    const items = list?.data?.newarticles || [];
+    const found = items.find((item) => {
+      const id =
+        typeof item._id === "object" && item._id?.$oid
+          ? item._id.$oid
+          : String(item._id);
+      return id === String(newarticle_id);
+    });
+    if (!found) {
+      return { success: false, message: "Service not found" };
+    }
+    return { success: true, data: found };
   } catch (error) {
     console.error("Error getting new article by ID:", error);
     throw error;

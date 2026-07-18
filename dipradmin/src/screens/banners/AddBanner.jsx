@@ -11,6 +11,8 @@ import {
 import { UploadOutlined } from "@ant-design/icons";
 import { uploadFileToAzureStorage } from "../../config/azurestorageservice"; // ✅ Azure service
 import { createBanner } from "../../service/Banner/BannersService";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
 
@@ -89,12 +91,16 @@ function AddBannerPage() {
 
   return (
     <div>
-      <h1>Add New Banner</h1>
+      <PageHeader
+        title="Add New Banner"
+        breadcrumbs={[
+          { title: "Banners", path: "/manage-banners" },
+          { title: "Add Banner" },
+        ]}
+      />
+      <FormCard>
       <div
         style={{
-          maxWidth: "80vw",
-          margin: "auto",
-          padding: "20px",
           display: "flex",
           gap: "20px",
         }}
@@ -151,6 +157,7 @@ function AddBannerPage() {
           </Form>
         </Card>
       </div>
+      </FormCard>
     </div>
   );
 }

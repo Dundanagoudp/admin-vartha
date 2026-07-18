@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, message, Space, Modal, Descriptions, Popconfirm } from "antd";
-import { EyeOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { message, Space, Modal, Descriptions, Popconfirm } from "antd";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getPhotoCategories, deletePhotoCategory } from "../../service/photoCategory/PhotoCategoryApi";
+import DataTableShell from "../../components/ui/DataTableShell";
+import { IconActionBtn } from "../../components/ui/ui.styles";
 
 function PhotoCategoryTable() {
   const navigate = useNavigate();
@@ -98,20 +100,16 @@ function PhotoCategoryTable() {
         const recordId = typeof record._id === 'object' && record._id?.$oid ? record._id.$oid : record._id;
         return (
           <Space>
-            <Button
-              type="default"
-              icon={<EyeOutlined />}
-              onClick={() => handleView(record)}
-            >
-              View
-            </Button>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
+            <IconActionBtn type="button" title="View" onClick={() => handleView(record)}>
+              <Eye size={16} />
+            </IconActionBtn>
+            <IconActionBtn
+              type="button"
+              title="Edit"
               onClick={() => navigate(`/photo-category/edit/${recordId}`)}
             >
-              Edit
-            </Button>
+              <Pencil size={16} />
+            </IconActionBtn>
             <Popconfirm
               title="Are you sure to delete this photo category?"
               onConfirm={() => handleDelete(recordId)}
@@ -119,9 +117,9 @@ function PhotoCategoryTable() {
               cancelText="No"
               okType="danger"
             >
-              <Button danger icon={<DeleteOutlined />}>
-                Delete
-              </Button>
+              <IconActionBtn type="button" title="Delete" $danger>
+                <Trash2 size={16} />
+              </IconActionBtn>
             </Popconfirm>
           </Space>
         );
@@ -131,7 +129,7 @@ function PhotoCategoryTable() {
 
   return (
     <div>
-      <Table
+      <DataTableShell
         columns={columns}
         dataSource={categories.map((cat) => {
           const id = typeof cat._id === 'object' && cat._id?.$oid ? cat._id.$oid : cat._id;
@@ -143,6 +141,7 @@ function PhotoCategoryTable() {
           return id;
         }}
         pagination={{ pageSize: 10 }}
+        emptyTitle="No photo categories found"
       />
 
       <Modal

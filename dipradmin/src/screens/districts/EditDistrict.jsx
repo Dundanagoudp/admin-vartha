@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Form, Input, Button, Card, message, Spin } from "antd";
+import { Form, Input, Button, message, Spin } from "antd";
 import { getDistrictById, updateDistrict } from "../../service/districts/DistrictsApi";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 function EditDistrict() {
   const [form] = Form.useForm();
@@ -87,22 +89,15 @@ function EditDistrict() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#f6f7f9",
-        padding: 24,
-      }}
-    >
-      <Card
-        style={{ width: 520, boxShadow: "0 8px 24px rgba(0,0,0,0.06)" }}
-        styles={{ body: { padding: 24 } }}
-      >
-        <h2 style={{ marginBottom: 20 }}>Edit District</h2>
-
+    <div>
+      <PageHeader
+        title="Edit District"
+        breadcrumbs={[
+          { title: "Districts", path: "/districts" },
+          { title: "Edit District" },
+        ]}
+      />
+      <FormCard style={{ maxWidth: 520 }}>
         <Form
           form={form}
           layout="vertical"
@@ -140,7 +135,7 @@ function EditDistrict() {
             </Button>
           </div>
         </Form>
-      </Card>
+      </FormCard>
     </div>
   );
 }

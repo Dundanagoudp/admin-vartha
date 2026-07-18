@@ -4,7 +4,7 @@ import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { PhotosWrapper } from "./Photos.style";
 import PhotosTable from "../../components/photos/photostable";
-// import BannersTable from "../../components/banners/BannersTable";
+import PageHeader from "../../components/ui/PageHeader";
 
 function PhtotosPage() {
   const navigate = useNavigate();
@@ -15,18 +15,19 @@ function PhtotosPage() {
 
   return (
     <PhotosWrapper>
-      <div className="header-section">
-        <div className="block-title">Photos</div>
-
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          className="add-article-btn"
-          onClick={handleAddBannerClick}
-        >
-          Add Photos
-        </Button>
-      </div>
+      <PageHeader
+        title="Photos"
+        breadcrumbs={[{ title: "Media" }]}
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddBannerClick}
+          >
+            Add Photos
+          </Button>
+        }
+      />
 
       {/* Banners Table */}
       <div className="block-Table">

@@ -4,6 +4,7 @@ import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import LongVideosTable from "../../components/longVideo/LongVideoTable";
+import PageHeader from "../../components/ui/PageHeader";
 
 function LongVideos() {
   const navigate = useNavigate();
@@ -14,17 +15,19 @@ function LongVideos() {
 
   return (
     <LongVideoWrapper>
-      <div className="header-section">
-        <div className="block-title">Long-video</div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          className="add-article-btn"
-          onClick={handleAddClick}
-        >
-          Add Video
-        </Button>
-      </div>
+      <PageHeader
+        title="Long Videos"
+        breadcrumbs={[{ title: "Videos" }]}
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddClick}
+          >
+            Add Video
+          </Button>
+        }
+      />
 
       <div className="block=table">
         <LongVideosTable />

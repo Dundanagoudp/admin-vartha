@@ -1,35 +1,30 @@
-/* Style for selected sidebar item */
+/* Global Ant Design overrides for Karnataka CMS theme */
+
 .ant-menu-item-selected {
-  background-color: #000 !important;
-  color: #fff !important;
+  background-color: rgba(0, 91, 172, 0.1) !important;
+  color: #005bac !important;
+  font-weight: 600;
 }
 
-/* Optional: Keep icon color white in selected state */
-.ant-menu-item-selected .anticon {
-  color: #fff !important;
+.ant-menu-item-selected .anticon,
+.ant-menu-item-selected .lucide {
+  color: #005bac !important;
 }
 
-.user-profile-card:hover {
-  transform: translateY(-7px);
+.ant-menu-light .ant-menu-item:hover {
+  background-color: #f8fafc !important;
+  color: #005bac !important;
 }
 
-.stat-card:hover {
-  transform: translateY(-7px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+.stat-card:hover,
+.cms-stats-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
   cursor: pointer;
-  background: #e6e6e6;
 }
 
 .hover-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.06);
 }
-/* 
-.hover-card:hover {
-  transform: translateY(-7px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  cursor: pointer;
-    background: #e6e6e6;
-} */

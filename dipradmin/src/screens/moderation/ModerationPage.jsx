@@ -1,16 +1,16 @@
 import React from "react";
 import { ModerationWrapper } from "./Moderation.Styles";
-import { Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
 import ModerationTable from "../../components/moderation/ModerationTable";
+import PageHeader from "../../components/ui/PageHeader";
 
 function ModerationPage() {
   return (
     <ModerationWrapper>
-      <div className="header-section">
-        <div className="block-title">Moderation</div>
-      </div>
-      <div classname="block-table">
+      <PageHeader
+        title="Moderation"
+        breadcrumbs={[{ title: "Moderation" }]}
+      />
+      <div className="moderation-table">
         <ModerationTable />
       </div>
     </ModerationWrapper>

@@ -1,19 +1,19 @@
 import styled from "styled-components";
 
-export const SidebarRoot = styled.div`
-  height: 100%;
+export const SidebarRoot = styled.aside`
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  border-right: 1px solid #eef0f4;
+  height: 100%;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
 `;
 
 export const BrandBlock = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 16px 16px;
-  border-bottom: 1px solid #eef0f4;
+  padding: 18px 16px 16px;
+  border-bottom: 1px solid #e5e7eb;
   flex-shrink: 0;
 `;
 
@@ -24,8 +24,8 @@ export const BrandMark = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f7f8fc;
-  border: 1px solid #eef0f4;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
   flex-shrink: 0;
   overflow: hidden;
 
@@ -42,16 +42,19 @@ export const BrandTextWrap = styled.div`
   min-width: 0;
   display: flex;
   flex-direction: column;
-  line-height: 1.25;
+  gap: 2px;
 
   .brand-title {
-    font-size: 15px;
-    color: #151d48;
+    color: #111827 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
   }
 
   .brand-sub {
-    font-size: 12px;
-    color: #737791;
+    color: #6b7280 !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
   }
 `;
 
@@ -60,15 +63,14 @@ export const MenuScroll = styled.div`
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 12px 8px 8px;
+  padding: 10px 0 8px;
 
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
-
   &::-webkit-scrollbar-thumb {
-    background: #d9dce5;
-    border-radius: 999px;
+    background: #e5e7eb;
+    border-radius: 4px;
   }
 
   .ant-menu {
@@ -77,39 +79,28 @@ export const MenuScroll = styled.div`
   }
 
   .ant-menu-item {
-    height: 42px;
-    line-height: 42px;
-    margin: 2px 0 !important;
-    width: 100% !important;
+    margin-inline: 8px;
+    width: calc(100% - 16px);
     border-radius: 10px;
+    color: #374151;
     font-weight: 500;
-    color: #3d4465;
-  }
-
-  .ant-menu-item .ant-menu-item-icon,
-  .ant-menu-item .anticon {
-    font-size: 16px;
-  }
-
-  .ant-menu-item:hover {
-    background: #f4f5fb !important;
   }
 
   .ant-menu-item-selected {
-    background: #eef0ff !important;
-    color: #5d5fef !important;
+    background: rgba(0, 91, 172, 0.1) !important;
+    color: #005bac !important;
     font-weight: 600;
+    box-shadow: inset 3px 0 0 #005bac;
   }
 
-  .ant-menu-item-selected .ant-menu-item-icon,
-  .ant-menu-item-selected .anticon {
-    color: #5d5fef !important;
+  .ant-menu-item .lucide {
+    display: inline-flex;
   }
 `;
 
 export const LogoutBar = styled.div`
   flex-shrink: 0;
-  padding: 12px 16px 16px;
-  border-top: 1px solid #eef0f4;
+  padding: 12px 14px 16px;
+  border-top: 1px solid #e5e7eb;
   background: #fff;
 `;

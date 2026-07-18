@@ -1,16 +1,22 @@
-import React from "react";
-import { Layout } from "antd";
+import React, { useState } from "react";
+import { Drawer, Layout } from "antd";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar.jsx";
+import TopNavbar from "./TopNavbar.jsx";
 
 const { Sider, Content } = Layout;
 
 const BaseLayout = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f5f6fa" }}>
+    <Layout style={{ minHeight: "100vh", background: "#F8FAFC" }}>
       <Sider
         width={260}
         theme="light"
+        breakpoint="lg"
+        collapsedWidth={0}
+        trigger={null}
         style={{
           background: "#fff",
           position: "fixed",
@@ -19,34 +25,62 @@ const BaseLayout = () => {
           bottom: 0,
           overflow: "hidden",
           zIndex: 100,
-          boxShadow: "0 0 0 1px #eef0f4, 4px 0 24px rgba(21, 29, 72, 0.04)",
+          borderRight: "1px solid #E5E7EB",
         }}
+        className="cms-sider-desktop"
       >
         <Sidebar />
       </Sider>
 
+      <Drawer
+        placement="left"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        width={280}
+        styles={{ body: { padding: 0 } }}
+        className="cms-sider-drawer"
+      >
+        <Sidebar onNavigate={() => setMobileOpen(false)} />
+      </Drawer>
+
       <Layout
+        className="cms-main-layout"
         style={{
           marginLeft: 260,
           minHeight: "100vh",
-          background: "#f5f6fa",
+          background: "#F8FAFC",
         }}
       >
+        <TopNavbar onMenuClick={() => setMobileOpen(true)} />
         <Content
           style={{
-            margin: 16,
+            margin: 0,
             padding: "20px 20px 28px",
-            background: "#fff",
-            borderRadius: 12,
-            minHeight: "calc(100vh - 32px)",
-            boxShadow: "0 1px 2px rgba(21, 29, 72, 0.04)",
+            background: "#F8FAFC",
+            minHeight: "calc(100vh - 68px)",
             overflowX: "auto",
-            width: "auto",
           }}
+          className="page-fade"
         >
           <Outlet />
         </Content>
       </Layout>
+
+      <style>{`
+        @media (max-width: 992px) {
+          .cms-sider-desktop {
+            display: none !important;
+          }
+          .cms-main-layout {
+            margin-left: 0 !important;
+          }
+        }
+        @media (min-width: 993px) {
+          .cms-sider-drawer {
+            display: none !important;
+          }
+        }
+      `}</style>
     </Layout>
   );
 };

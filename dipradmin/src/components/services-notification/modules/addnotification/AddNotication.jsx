@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
-  Card,
   Input,
   Form,
   message,
@@ -11,8 +10,10 @@ import {
 import { LinkOutlined } from "@ant-design/icons";
 import { createNewArticle } from "../../../../service/servicenotification/Servicenotification";
 import { AddNotificationWrapper } from "./AddNotication.styles";
+import PageHeader from "../../../ui/PageHeader";
+import { FormCard } from "../../../ui";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 function AddNotication() {
   const [form] = Form.useForm();
@@ -55,10 +56,14 @@ function AddNotication() {
 
   return (
     <AddNotificationWrapper>
-      <Card className="form-card">
-        <Title level={4} className="form-title">
-          Add New Article
-        </Title>
+      <PageHeader
+        title="Add New Article"
+        breadcrumbs={[
+          { title: "Service Notifications", path: "/ServiceNotification" },
+          { title: "Add Article" },
+        ]}
+      />
+      <FormCard className="form-card">
         <Text type="secondary" className="form-subtitle">
           Create a new article with title and link.
         </Text>
@@ -147,7 +152,7 @@ function AddNotication() {
             </Button>
           </div>
         </Form>
-      </Card>
+      </FormCard>
     </AddNotificationWrapper>
   );
 }

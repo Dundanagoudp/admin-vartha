@@ -1,14 +1,27 @@
 const LLM_URL = import.meta.env.VITE_LLM_API_URL;
+const RAW_BASE = import.meta.env.VITE_BASE_URL || "";
+const BASE_URL = String(RAW_BASE).replace(/\/+$/, "");
 
+/** GET list from our backend — normalize to { data: { photo_categories } } for admin tables */
 export const getPhotoCategories = async () => {
   try {
-    const response = await fetch(`${LLM_URL}/api/photo-category/list`, {
+    if (!BASE_URL) {
+      throw new Error("VITE_BASE_URL is not set");
+    }
+    const response = await fetch(`${BASE_URL}/api/photo-category/list`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
     const data = await response.json();
+
+    if (data?.success && Array.isArray(data.data)) {
+      return { success: true, data: { photo_categories: data.data } };
+    }
+    if (data?.data?.photo_categories) {
+      return data;
+    }
     return data;
   } catch (error) {
     console.error("Error loading photo categories:", error);
@@ -18,14 +31,17 @@ export const getPhotoCategories = async () => {
 
 export const getPhotoCategoryById = async (id) => {
   try {
-    const response = await fetch(`${LLM_URL}/api/photo-category/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const list = await getPhotoCategories();
+    const categories = list?.data?.photo_categories || [];
+    const found = categories.find((c) => {
+      const cid =
+        typeof c._id === "object" && c._id?.$oid ? c._id.$oid : String(c._id);
+      return cid === String(id);
     });
-    const data = await response.json();
-    return data;
+    if (!found) {
+      return { success: false, message: "Photo category not found" };
+    }
+    return { success: true, data: found };
   } catch (error) {
     console.error("Error loading photo category:", error);
     throw error;
@@ -39,7 +55,7 @@ export const createPhotoCategory = async (categoryData) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(categoryData),
     });
@@ -58,7 +74,7 @@ export const deletePhotoCategory = async (id) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     const data = await response.json();
@@ -76,7 +92,7 @@ export const updatePhotoCategory = async (id, categoryData) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(categoryData),
     });

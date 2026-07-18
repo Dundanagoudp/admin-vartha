@@ -4,17 +4,54 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 // ArticleService.js
 const LLM_URL = import.meta.env.VITE_LLM_API_URL;  // <- not LLM_API_URL
 
+const NEWS_TYPES = ["statenews", "districtnews", "specialnews", "articles"];
 
-export const getArticles = async () => {
+/**
+ * Fast list for Manage Articles — uses paginated news-new APIs (already on our backend).
+ * GET /api/news-new/getNewsByNewsType/:newsType?page=&limit=
+ * Merges all types, newest first. POST create still uses digi9 (unchanged).
+ */
+export const getArticles = async (page = 1, limit = 50) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/news`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    if (!BASE_URL) {
+      throw new Error("VITE_BASE_URL is not set");
+    }
+
+    const safePage = Math.max(1, Number(page) || 1);
+    const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 50);
+
+    const results = await Promise.all(
+      NEWS_TYPES.map(async (newsType) => {
+        try {
+          const response = await fetch(
+            `${BASE_URL}/api/news-new/getNewsByNewsType/${newsType}?page=${safePage}&limit=${safeLimit}`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+          const json = await response.json();
+          return Array.isArray(json?.data) ? json.data : [];
+        } catch (err) {
+          console.error(`getArticles ${newsType} error:`, err);
+          return [];
+        }
+      })
+    );
+
+    const byId = new Map();
+    results.flat().forEach((item) => {
+      if (!item?._id) return;
+      byId.set(String(item._id), item);
     });
-    const data = await response.json();
-    return data;
+
+    const data = Array.from(byId.values()).sort((a, b) => {
+      const da = new Date(a.createdTime || a.publishedAt || a.createdAt || 0).getTime();
+      const db = new Date(b.createdTime || b.publishedAt || b.createdAt || 0).getTime();
+      return db - da;
+    });
+
+    return { success: true, data };
   } catch (error) {
     console.error("Error loading data:", error);
     throw error;

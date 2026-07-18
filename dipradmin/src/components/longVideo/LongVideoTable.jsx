@@ -1,34 +1,25 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  Button,
   Popconfirm,
   message,
   Space,
   Image,
   Modal,
-  Input,
-  Tag,
   Tooltip,
   Descriptions,
-  Typography,
 } from "antd";
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  CheckOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
+import { Eye, Pencil, Trash2, Check } from "lucide-react";
 import {
   getShortVideos,
   deleteById,
   approveVideo,
   getLongVideoHistoryById,
 } from "../../service/LongVideo/LongVideoService";
-import { data, useNavigate } from "react-router-dom";
-
-const { Title, Text } = Typography;
+import { useNavigate } from "react-router-dom";
+import DataTableShell from "../ui/DataTableShell";
+import SearchBar from "../ui/SearchBar";
+import StatusBadge from "../ui/StatusBadge";
+import { IconActionBtn } from "../ui/ui.styles";
 
 function LongVideoTable() {
   const [videos, setVideos] = useState([]);
@@ -124,11 +115,11 @@ const fetchVideos = async () => {
     setSelectedVideo(null);
   };
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value.toLowerCase();
+  const handleSearchChange = (value) => {
     setSearchText(value);
+    const q = (value || "").toLowerCase();
     const filtered = videos.filter((v) =>
-      v.title?.toLowerCase().includes(value)
+      v.title?.toLowerCase().includes(q)
     );
     setFilteredVideos(filtered);
   };
@@ -230,21 +221,21 @@ const fetchVideos = async () => {
       dataIndex: "status",
       key: "status",
       render: (status, record) => (
-        <Tag
-          color={status === "approved" ? "green" : "orange"}
+        <div
+          onClick={() => handleStatusClick(record)}
           style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
             cursor:
               userRole === "admin" && status === "pending"
                 ? "pointer"
                 : "default",
           }}
-          onClick={() => handleStatusClick(record)}
         >
-          {status.toUpperCase()}
-          {userRole === "admin" && status === "pending" && (
-            <CheckOutlined style={{ marginLeft: 5 }} />
-          )}
-        </Tag>
+          <StatusBadge status={status} />
+          {userRole === "admin" && status === "pending" && <Check size={14} />}
+        </div>
       ),
     },
     {
@@ -252,23 +243,22 @@ const fetchVideos = async () => {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button
-            type="default"
-            icon={<EyeOutlined />}
+          <IconActionBtn
+            type="button"
+            title="View"
             onClick={() => handleViewDetails(record)}
-            style={{ marginRight: 8 }}
           >
-            View
-          </Button>
-
+            <Eye size={16} />
+          </IconActionBtn>
           <Tooltip title="Edit">
-            <Button
-              type="default"
-              icon={<EditOutlined />}
+            <IconActionBtn
+              type="button"
+              title="Edit"
               onClick={() => handleEdit(record._id)}
-            />
+            >
+              <Pencil size={16} />
+            </IconActionBtn>
           </Tooltip>
-
           {(userRole === "admin" ||
             (userRole === "moderator" &&
               record.createdBy?._id === localStorage.getItem("userId"))) && (
@@ -278,7 +268,9 @@ const fetchVideos = async () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button danger icon={<DeleteOutlined />} />
+              <IconActionBtn type="button" title="Delete" $danger>
+                <Trash2 size={16} />
+              </IconActionBtn>
             </Popconfirm>
           )}
         </Space>
@@ -288,29 +280,21 @@ const fetchVideos = async () => {
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        <Input
-          placeholder="Search by Title"
-          value={searchText}
-          onChange={handleSearchChange}
-          prefix={<SearchOutlined />}
-          allowClear
-          style={{ width: 250 }}
-        />
-      </div>
-
-      <Table
+      <DataTableShell
+        toolbar={
+          <SearchBar
+            placeholder="Search by Title"
+            value={searchText}
+            onChange={handleSearchChange}
+            style={{ marginLeft: "auto" }}
+          />
+        }
         columns={columns}
         dataSource={filteredVideos}
         loading={loading}
         rowKey="_id"
         pagination={{ pageSize: 10 }}
+        emptyTitle="No long videos found"
       />
 
       {/* Video Details Modal - Updated to match ShortVideosTable design */}
@@ -371,13 +355,7 @@ const fetchVideos = async () => {
                 {selectedVideo.Total_views || 0}
               </Descriptions.Item> */}
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedVideo.status === "approved" ? "green" : "orange"
-                  }
-                >
-                  {selectedVideo.status.toUpperCase()}
-                </Tag>
+                <StatusBadge status={selectedVideo.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedVideo.createdBy?.displayName || "N/A"}
@@ -450,11 +428,7 @@ const fetchVideos = async () => {
               {selectedVideo.total_Likes || 0}
             </Descriptions.Item> */}
             <Descriptions.Item label="Status">
-              <Tag
-                color={selectedVideo.status === "approved" ? "green" : "orange"}
-              >
-                {selectedVideo.status.toUpperCase()}
-              </Tag>
+              <StatusBadge status={selectedVideo.status} />
             </Descriptions.Item>
             <Descriptions.Item label="Thumbnail">
               <Image

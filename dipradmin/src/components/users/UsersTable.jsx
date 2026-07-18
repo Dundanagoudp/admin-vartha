@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
   Avatar,
   Tag,
   Button,
@@ -14,13 +13,7 @@ import {
   message,
   Descriptions,
 } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  UserOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { Eye, Trash2, User, Plus } from "lucide-react";
 import {
   getUsers,
   createModerator,
@@ -28,6 +21,8 @@ import {
   deleteUser,
 } from "../../service/User/UserApi";
 import { createAdmin } from "../../service/User/UserApi"; // Add this import
+import DataTableShell from "../ui/DataTableShell";
+import { IconActionBtn } from "../ui/ui.styles";
 
 const moment = window.moment;
 const { TabPane } = Tabs;
@@ -256,28 +251,25 @@ function UsersTable() {
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="View User">
-            <Button
-              type="primary"
-              icon={<EyeOutlined />}
+            <IconActionBtn
+              type="button"
+              title="View"
               onClick={() => handleViewUser(record._id)}
-            />
+            >
+              <Eye size={16} />
+            </IconActionBtn>
           </Tooltip>
           {currentUserRole === "admin" && (
-            <>
-              {/* <Tooltip title="Edit User">
-                <Button
-                  icon={<EditOutlined />}
-                  onClick={() => handleEdit(record._id)}
-                />
-              </Tooltip> */}
-              <Tooltip title="Delete User">
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => showDeleteConfirm(record._id)}
-                />
-              </Tooltip>
-            </>
+            <Tooltip title="Delete User">
+              <IconActionBtn
+                type="button"
+                title="Delete"
+                $danger
+                onClick={() => showDeleteConfirm(record._id)}
+              >
+                <Trash2 size={16} />
+              </IconActionBtn>
+            </Tooltip>
           )}
         </Space>
       ),
@@ -306,7 +298,7 @@ function UsersTable() {
         return (
           <Button
             type="primary"
-            icon={<PlusOutlined />}
+            icon={<Plus size={16} />}
             onClick={handleCreateModerator}
           >
             Create Moderator
@@ -316,7 +308,7 @@ function UsersTable() {
         return (
           <Button
             type="primary"
-            icon={<PlusOutlined />}
+            icon={<Plus size={16} />}
             onClick={handleCreateAdmin}
           >
             Create Admin
@@ -337,7 +329,7 @@ function UsersTable() {
         {getTabs()}
       </Tabs>
 
-      <Table
+      <DataTableShell
         columns={columns}
         dataSource={filteredUsers.map((user) => ({
           key: user._id,
@@ -345,6 +337,7 @@ function UsersTable() {
         }))}
         loading={loading}
         pagination={{ pageSize: 10 }}
+        emptyTitle="No users found"
       />
 
       {/* Create Moderator/Admin Modal */}
@@ -427,7 +420,7 @@ function UsersTable() {
               {currentUser.profileImage ? (
                 <Avatar src={currentUser.profileImage} size={64} />
               ) : (
-                <Avatar icon={<UserOutlined />} size={64} />
+                <Avatar icon={<User size={24} />} size={64} />
               )}
             </Descriptions.Item>
             <Descriptions.Item label="Name">

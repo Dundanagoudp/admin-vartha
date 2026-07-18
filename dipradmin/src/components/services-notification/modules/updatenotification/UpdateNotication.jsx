@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
-  Card,
   Input,
   Form,
   message,
@@ -15,8 +14,10 @@ import {
   updateNewArticle,
 } from "../../../../service/servicenotification/Servicenotification";
 import { UpdateNotificationWrapper } from "./UpdateNotication.styles";
+import PageHeader from "../../../ui/PageHeader";
+import { FormCard } from "../../../ui";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 function UpdateNotication() {
   const [form] = Form.useForm();
@@ -106,10 +107,14 @@ function UpdateNotication() {
 
   return (
     <UpdateNotificationWrapper>
-      <Card className="form-card">
-        <Title level={4} className="form-title">
-          Update Article
-        </Title>
+      <PageHeader
+        title="Update Article"
+        breadcrumbs={[
+          { title: "Service Notifications", path: "/ServiceNotification" },
+          { title: "Update Article" },
+        ]}
+      />
+      <FormCard className="form-card">
         <Text type="secondary" className="form-subtitle">
           Update the article title and link.
         </Text>
@@ -206,7 +211,7 @@ function UpdateNotication() {
             </Button>
           </div>
         </Form>
-      </Card>
+      </FormCard>
     </UpdateNotificationWrapper>
   );
 }

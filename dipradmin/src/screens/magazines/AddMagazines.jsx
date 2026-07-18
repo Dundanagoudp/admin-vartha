@@ -411,6 +411,8 @@ import {
 import { UploadOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { createMagazine } from "../../service/Magazine/MagazineService";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -516,18 +518,21 @@ function AddMagazinePage() {
   };
 
   return (
-    <div style={{ padding: "24px", maxWidth: "80vw", margin: "0 auto" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "24px",
-        }}
-      >
-        <h1>Add Vartha Janapada</h1>
-        {userRole === "moderator" && <Tag color="orange">Requires Admin Approval</Tag>}
-      </div>
+    <div>
+      <PageHeader
+        title="Add Vartha Janapada"
+        breadcrumbs={[
+          { title: "Vartha Janapada", path: "/manage-varthajanapada" },
+          { title: "Add Magazine" },
+        ]}
+        extra={
+          userRole === "moderator" ? (
+            <Tag color="orange">Requires Admin Approval</Tag>
+          ) : null
+        }
+      />
 
+      <FormCard>
       <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
         {/* Thumbnail Upload Card */}
         <Card title="Thumbnail" style={{ flex: 1, minWidth: "300px" }}>
@@ -646,6 +651,7 @@ function AddMagazinePage() {
           </Form>
         </Card>
       </div>
+      </FormCard>
     </div>
   );
 }

@@ -3,10 +3,8 @@ import { MagazineWrapper } from "../magazines/MagazinesPage.styles";
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-// import MagazineTable from "../../components/magazines/MagazineTable";
 import MagazineTable2 from "../../components/magazines/MagazineTable2";
-import MagazineTable from "../../components/magazines/MagazineTable";
-
+import PageHeader from "../../components/ui/PageHeader";
 
 function MagazinesPage2() {
   const navigate = useNavigate();
@@ -17,17 +15,19 @@ function MagazinesPage2() {
 
   return (
     <MagazineWrapper>
-      <div className="header-section">
-        <div className="block-title">Vartha janapada</div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          className="add-article-btn"
-          onClick={handleAddArticleClick}
-        >
-          Add Magazine
-        </Button>
-      </div>
+      <PageHeader
+        title="Vartha Janapada"
+        breadcrumbs={[{ title: "Magazines" }]}
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddArticleClick}
+          >
+            Add Magazine
+          </Button>
+        }
+      />
       <div className="block-table">
         <MagazineTable2 />
       </div>

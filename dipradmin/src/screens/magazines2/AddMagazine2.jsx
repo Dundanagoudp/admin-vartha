@@ -304,6 +304,8 @@ import { UploadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { createMagazine } from "../../service/Magazine/MagazineService2";
 import { getCategories } from "../../service/categories/CategoriesApi";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -409,12 +411,16 @@ function AddMagazinePage2() {
 
   return (
     <div>
-      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Add New Magazine</h1>
+      <PageHeader
+        title="Add New Magazine"
+        breadcrumbs={[
+          { title: "March of Karnataka", path: "/manage-marchofkarnataka" },
+          { title: "Add Magazine" },
+        ]}
+      />
+      <FormCard>
       <div
         style={{
-          maxWidth: "80vw",
-          margin: "auto",
-          padding: "20px",
           display: "flex",
           gap: "20px",
           flexWrap: "wrap",
@@ -543,6 +549,7 @@ function AddMagazinePage2() {
           </Form>
         </Card>
       </div>
+      </FormCard>
     </div>
   );
 }

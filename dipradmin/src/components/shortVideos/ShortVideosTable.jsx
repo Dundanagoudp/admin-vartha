@@ -1,34 +1,24 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  Button,
   Popconfirm,
   message,
   Space,
   Image,
   Modal,
-  Input,
-  Tag,
   Descriptions,
-  Typography,
 } from "antd";
-import { EditOutlined } from "@ant-design/icons";
-
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  CheckOutlined,
-} from "@ant-design/icons";
+import { Eye, Pencil, Trash2, Check } from "lucide-react";
 import {
   getShortVideos,
   deleteById,
   approveVideo,
   getHistoryOfShortVideosById,
 } from "../../service/ShortVideos/ShortVideoservice";
-import { data, useNavigate } from "react-router-dom";
-
-const { Title, Text } = Typography;
+import { useNavigate } from "react-router-dom";
+import DataTableShell from "../ui/DataTableShell";
+import SearchBar from "../ui/SearchBar";
+import StatusBadge from "../ui/StatusBadge";
+import { IconActionBtn } from "../ui/ui.styles";
 
 function ShortVideosTable() {
   const [videos, setVideos] = useState([]);
@@ -153,11 +143,11 @@ function ShortVideosTable() {
     }
   };
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value.toLowerCase();
+  const handleSearchChange = (value) => {
     setSearchText(value);
+    const q = (value || "").toLowerCase();
     const filtered = videos.filter((video) =>
-      video.title.toLowerCase().includes(value)
+      video.title.toLowerCase().includes(q)
     );
     setFilteredVideos(filtered);
   };
@@ -238,19 +228,21 @@ function ShortVideosTable() {
       dataIndex: "status",
       key: "status",
       render: (status, record) => (
-        <Tag
-          color={status === "approved" ? "green" : "orange"}
+        <div
+          onClick={() => handleStatusClick(record)}
           style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
             cursor:
               userRole === "admin" && status === "pending"
                 ? "pointer"
                 : "default",
           }}
-          onClick={() => handleStatusClick(record)}
         >
-          {status.toUpperCase()}
-          {userRole === "admin" && status === "pending" && <CheckOutlined />}
-        </Tag>
+          <StatusBadge status={status} />
+          {userRole === "admin" && status === "pending" && <Check size={14} />}
+        </div>
       ),
     },
     {
@@ -258,21 +250,20 @@ function ShortVideosTable() {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button
-            type="default"
-            icon={<EyeOutlined />}
+          <IconActionBtn
+            type="button"
+            title="View"
             onClick={() => handleViewDetails(record)}
-            style={{ marginRight: 8 }}
           >
-            View
-          </Button>
-
-          <Button
-            type="default"
-            icon={<EditOutlined />}
+            <Eye size={16} />
+          </IconActionBtn>
+          <IconActionBtn
+            type="button"
+            title="Edit"
             onClick={() => handleEdit(record._id)}
-          />
-
+          >
+            <Pencil size={16} />
+          </IconActionBtn>
           {(userRole === "admin" ||
             (userRole === "moderator" &&
               record.createdBy?._id === localStorage.getItem("userId"))) && (
@@ -282,7 +273,9 @@ function ShortVideosTable() {
               okText="Yes"
               cancelText="No"
             >
-              <Button danger icon={<DeleteOutlined />} />
+              <IconActionBtn type="button" title="Delete" $danger>
+                <Trash2 size={16} />
+              </IconActionBtn>
             </Popconfirm>
           )}
         </Space>
@@ -292,30 +285,21 @@ function ShortVideosTable() {
 
   return (
     <div>
-      {/* Search Bar */}
-      <div
-        style={{
-          marginBottom: 16,
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        <Input
-          placeholder="Search by Title"
-          value={searchText}
-          onChange={handleSearchChange}
-          prefix={<SearchOutlined />}
-          allowClear
-          style={{ width: 250 }}
-        />
-      </div>
-
-      <Table
+      <DataTableShell
+        toolbar={
+          <SearchBar
+            placeholder="Search by Title"
+            value={searchText}
+            onChange={handleSearchChange}
+            style={{ marginLeft: "auto" }}
+          />
+        }
         columns={columns}
         dataSource={filteredVideos}
         loading={loading}
         rowKey="_id"
         pagination={{ pageSize: 10 }}
+        emptyTitle="No short videos found"
       />
 
       {/* Video Details Modal */}
@@ -382,13 +366,7 @@ function ShortVideosTable() {
                 {selectedVideo.Total_views || 0}
               </Descriptions.Item> */}
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedVideo.status === "approved" ? "green" : "orange"
-                  }
-                >
-                  {selectedVideo.status.toUpperCase()}
-                </Tag>
+                <StatusBadge status={selectedVideo.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedVideo.createdBy?.displayName || "N/A"}
@@ -455,13 +433,7 @@ function ShortVideosTable() {
                 {selectedVideo.total_Likes || 0}
               </Descriptions.Item> */}
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedVideo.status === "approved" ? "green" : "orange"
-                  }
-                >
-                  {selectedVideo.status.toUpperCase()}
-                </Tag>
+                <StatusBadge status={selectedVideo.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Thumbnail">
                 <Image

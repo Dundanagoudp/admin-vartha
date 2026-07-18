@@ -4,15 +4,15 @@ import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import MagazineTable from "../../components/magazines/MagazineTable";
-import MagazineTable2 from "../../components/magazines/MagazineTable2";
+import PageHeader from "../../components/ui/PageHeader";
 
 /**
  * Page to list and add Magazines
- * 
+ *
  * This page displays a table of all Magazines and a button to add a new Magazine.
  * The table is a custom component and is responsible for displaying the data and
  * providing functionality to delete a Magazine.
- * 
+ *
  * @return {ReactElement} The Magazines page
  */
 function MagazinesPage() {
@@ -24,17 +24,19 @@ function MagazinesPage() {
 
   return (
     <MagazineWrapper>
-      <div className="header-section">
-        <div className="block-title">March of karnataka</div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          className="add-article-btn"
-          onClick={handleAddArticleClick}
-        >
-          Add Magazine
-        </Button>
-      </div>
+      <PageHeader
+        title="March of Karnataka"
+        breadcrumbs={[{ title: "Magazines" }]}
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddArticleClick}
+          >
+            Add Magazine
+          </Button>
+        }
+      />
       <div className="block-table">
         <MagazineTable />
       </div>

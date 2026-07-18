@@ -1,80 +1,73 @@
 import { createGlobalStyle } from "styled-components";
-import { media } from "../theme/theme";
+
 export const GlobalStyles = createGlobalStyle`
-    *{
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: inherit;
-    }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-    body{
-        font-family: ${(props) => props.theme.typography.fontFamily};
-        font-weight: 400;
-        font-size: 16px;
-        line-height: 1.6;
-        background: #f5f6fa;
-        color: #151d48;
-    }
+  body {
+    font-family: ${(props) => props.theme.typography.fontFamily};
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.55;
+    background: ${(props) => props.theme.colors.background};
+    color: ${(props) => props.theme.colors.text};
+    -webkit-font-smoothing: antialiased;
+  }
 
-    html {
-        scroll-behavior: smooth;
-    }
+  html {
+    scroll-behavior: smooth;
+  }
 
-    ul {
-        list-style: none;
-    }
+  ul {
+    list-style: none;
+  }
 
-    img{
-        width: 100%;
-        display: block;
-        max-width: 100%;
-    }
-    button{
-        border: none;
-        outline: 0;
-        background-color: transparent;
-    }
-    a{
-        color: unset;
-        text-decoration: none;
-    }
+  img {
+    max-width: 100%;
+    display: block;
+  }
 
-   
-   .page-wrapper {
-  display: flex;
-  flex-direction: row;
- 
-  height:100vh;
+  button {
+    font-family: inherit;
+  }
 
-}
+  a {
+    color: unset;
+    text-decoration: none;
+  }
 
-/* Sidebar - Fixed to the Left */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 260px; /* Same as Sidebar width */
-  background-color:rgb(255, 255, 255);
-  color: white;
-}
+  *:focus-visible {
+    outline: 2px solid ${(props) => props.theme.colors.primary};
+    outline-offset: 2px;
+  }
 
-/* Content Area (Main Content) */
-.content-wrapper {
-  flex-grow: 1;
- 
-  display: flex;
-  flex-direction: column;
-}
+  .page-fade {
+    animation: pageFade 0.28s ease;
+  }
 
-.content-area {
-  margin: 16px;
-  flex-grow: 1;
-  overflow-y: auto;
-}
+  @keyframes pageFade {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .text{
-        color: ${(props) => props.theme.colors.gray700};
-    }
+  .ant-btn {
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  }
+
+  .ant-btn:active {
+    transform: translateY(1px);
+  }
+
+  .ant-table-wrapper .ant-table-thead > tr > th {
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+  }
+
+  .ant-table-wrapper .ant-table-tbody > tr > td {
+    font-size: 14px;
+  }
 `;

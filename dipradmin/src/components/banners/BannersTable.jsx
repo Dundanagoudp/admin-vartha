@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { 
-  Table, 
-  Button, 
   Popconfirm, 
   message, 
   Image, 
   Space, 
-  Tag, 
   Modal,
-  Typography,
   Descriptions 
 } from "antd";
-import { EyeOutlined, DeleteOutlined, CheckOutlined, EditOutlined } from "@ant-design/icons";
+import { Eye, Pencil, Trash2, Check } from "lucide-react";
 import { getBanners, deleteBanner, approveBanner } from "../../service/Banner/BannersService";
 import { useNavigate } from "react-router-dom";
-
-const { Title, Text } = Typography;
+import DataTableShell from "../ui/DataTableShell";
+import StatusBadge from "../ui/StatusBadge";
+import { IconActionBtn } from "../ui/ui.styles";
 
 function BannersTable() {
   const [banners, setBanners] = useState([]);
@@ -138,16 +135,21 @@ function BannersTable() {
       dataIndex: "status",
       key: "status",
       render: (status, record) => (
-        <Tag 
-          color={status === "approved" ? "green" : "orange"}
-          style={{ cursor: role === "admin" && status !== "approved" ? "pointer" : "default" }}
-          onClick={() => role === "admin" && status !== "approved" && handleApproveClick(record)}
+        <div
+          onClick={() =>
+            role === "admin" && status !== "approved" && handleApproveClick(record)
+          }
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            cursor:
+              role === "admin" && status !== "approved" ? "pointer" : "default",
+          }}
         >
-          {status.toUpperCase()}
-          {role === "admin" && status !== "approved" && (
-            <span style={{ marginLeft: 5 }}><CheckOutlined /></span>
-          )}
-        </Tag>
+          <StatusBadge status={status} />
+          {role === "admin" && status !== "approved" && <Check size={14} />}
+        </div>
       ),
     },
     {
@@ -155,17 +157,13 @@ function BannersTable() {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button
-            type="default"
-            icon={<EyeOutlined />}
-            onClick={() => handleView(record)}
-          />
+          <IconActionBtn type="button" title="View" onClick={() => handleView(record)}>
+            <Eye size={16} />
+          </IconActionBtn>
           {(role === "admin" || role === "moderator") && (
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-            />
+            <IconActionBtn type="button" title="Edit" onClick={() => handleEdit(record)}>
+              <Pencil size={16} />
+            </IconActionBtn>
           )}
           {(role === "admin" || (role === "moderator" && record.createdBy?._id === localStorage.getItem("userId"))) && (
             <Popconfirm
@@ -174,7 +172,9 @@ function BannersTable() {
               okText="Yes"
               cancelText="No"
             >
-              <Button danger icon={<DeleteOutlined />} />
+              <IconActionBtn type="button" title="Delete" $danger>
+                <Trash2 size={16} />
+              </IconActionBtn>
             </Popconfirm>
           )}
         </Space>
@@ -184,12 +184,13 @@ function BannersTable() {
 
   return (
     <div>
-      <Table
+      <DataTableShell
         columns={columns}
         dataSource={banners}
         loading={loading}
         rowKey="_id"
         pagination={{ pageSize: 10 }}
+        emptyTitle="No banners found"
       />
 
       {/* View Banner Modal */}
@@ -216,9 +217,7 @@ function BannersTable() {
                 {selectedBanner.description || "No description"}
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag color={selectedBanner.status === "approved" ? "green" : "orange"}>
-                  {selectedBanner.status}
-                </Tag>
+                <StatusBadge status={selectedBanner.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedBanner.createdBy?.displayName || "Unknown"}
@@ -259,9 +258,7 @@ function BannersTable() {
                 {selectedBanner.description || "No description"}
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag color={selectedBanner.status === "approved" ? "green" : "orange"}>
-                  {selectedBanner.status}
-                </Tag>
+                <StatusBadge status={selectedBanner.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedBanner.createdBy?.displayName || "Unknown"}

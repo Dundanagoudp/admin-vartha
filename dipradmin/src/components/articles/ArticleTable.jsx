@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  Button,
   Image,
   Popconfirm,
   message,
   Modal,
-  Typography,
-  Input,
   Space,
-  Tag,
   Descriptions,
 } from "antd";
 import {
@@ -19,16 +14,12 @@ import {
   getHistoryById, // ✅ Import history API
 } from "../../service/Article/ArticleService";
 import { getDistricts } from "../../service/districts/DistrictsApi";
-import {
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  CheckOutlined,
-} from "@ant-design/icons";
+import { Eye, Pencil, Trash2, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const { Title, Text } = Typography;
+import DataTableShell from "../ui/DataTableShell";
+import SearchBar from "../ui/SearchBar";
+import StatusBadge from "../ui/StatusBadge";
+import { IconActionBtn } from "../ui/ui.styles";
 
 function ArticleTable() {
   const [articles, setArticles] = useState([]);
@@ -61,11 +52,12 @@ function ArticleTable() {
 
   const fetchArticles = async () => {
     try {
-      const response = await getArticles();
-      // console.log("Article table response", response);
+      // Fast GET: /api/news-new/getNewsByNewsType/* (our backend, paginated)
+      const response = await getArticles(1, 50);
       if (response.success) {
-        setArticles(response.data);
-        setFilteredArticles(response.data);
+        const list = Array.isArray(response.data) ? response.data : [];
+        setArticles(list);
+        setFilteredArticles(list);
       } else {
         message.error("Failed to load articles");
       }
@@ -133,11 +125,11 @@ function ArticleTable() {
     }
   };
 
-  const handleSearch = (e) => {
-    const value = e.target.value.toLowerCase();
+  const handleSearch = (value) => {
     setSearchText(value);
+    const q = (value || "").toLowerCase();
     const filtered = articles.filter((article) =>
-      article.title.toLowerCase().includes(value)
+      article.title.toLowerCase().includes(q)
     );
     setFilteredArticles(filtered);
   };
@@ -178,8 +170,15 @@ function ArticleTable() {
     },
     {
       title: "Category",
-      dataIndex: ["category", "name"],
+      dataIndex: "category",
       key: "category",
+      render: (category) => {
+        if (!category) return "N/A";
+        if (typeof category === "object") {
+          return category.name || category.english || "N/A";
+        }
+        return "N/A";
+      },
     },
     {
       title: "Magazine types",
@@ -277,20 +276,23 @@ function ArticleTable() {
       dataIndex: "status",
       key: "status",
       render: (status, record) => (
-        <div onClick={(e) => e.stopPropagation()}>
-          <Tag
-            color={status === "approved" ? "green" : "orange"}
-            style={{
-              cursor:
-                userRole === "admin" && status === "pending"
-                  ? "pointer"
-                  : "default",
-            }}
-            onClick={(e) => handleStatusClick(record, e)}
-          >
-            {status.toUpperCase()}
-            {userRole === "admin" && status === "pending" && <CheckOutlined />}
-          </Tag>
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            handleStatusClick(record, e);
+          }}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            cursor:
+              userRole === "admin" && status === "pending"
+                ? "pointer"
+                : "default",
+          }}
+        >
+          <StatusBadge status={status} />
+          {userRole === "admin" && status === "pending" && <Check size={14} />}
         </div>
       ),
     },
@@ -299,25 +301,12 @@ function ArticleTable() {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button
-            type="default"
-            icon={<EyeOutlined />}
-            onClick={() => handleView(record)}
-          />
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record._id)}
-          />
-          {/* <Popconfirm
-            title="Are you sure to delete this article?"
-            onConfirm={() => handleDelete(record._id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button danger icon={<DeleteOutlined />} />
-          </Popconfirm> */}
-
+          <IconActionBtn type="button" title="View" onClick={() => handleView(record)}>
+            <Eye size={16} />
+          </IconActionBtn>
+          <IconActionBtn type="button" title="Edit" onClick={() => handleEdit(record._id)}>
+            <Pencil size={16} />
+          </IconActionBtn>
           {(userRole === "admin" ||
             (userRole === "moderator" &&
               record.createdBy?._id === localStorage.getItem("userId"))) && (
@@ -327,7 +316,9 @@ function ArticleTable() {
               okText="Yes"
               cancelText="No"
             >
-              <Button danger icon={<DeleteOutlined />} />
+              <IconActionBtn type="button" title="Delete" $danger>
+                <Trash2 size={16} />
+              </IconActionBtn>
             </Popconfirm>
           )}
         </Space>
@@ -337,25 +328,21 @@ function ArticleTable() {
 
   return (
     <>
-      <Space
-        style={{ display: "flex", justifyContent: "right", marginBottom: 16 }}
-      >
-        <Input
-          placeholder="Search by Title"
-          value={searchText}
-          onChange={handleSearch}
-          prefix={<SearchOutlined />}
-          allowClear
-          style={{ width: 250 }}
-        />
-      </Space>
-
-      <Table
+      <DataTableShell
+        toolbar={
+          <SearchBar
+            placeholder="Search by Title"
+            value={searchText}
+            onChange={handleSearch}
+            style={{ marginLeft: "auto" }}
+          />
+        }
         dataSource={filteredArticles}
         columns={columns}
         loading={loading}
         rowKey="_id"
         pagination={{ pageSize: 10 }}
+        emptyTitle="No articles found"
       />
 
       {/* Article View Modal */}
@@ -411,13 +398,7 @@ function ArticleTable() {
                 {selectedArticle.views || 0}
               </Descriptions.Item> */}
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedArticle.status === "approved" ? "green" : "orange"
-                  }
-                >
-                  {selectedArticle.status.toUpperCase()}
-                </Tag>
+                <StatusBadge status={selectedArticle.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedArticle.createdBy?.displayName || "N/A"}
@@ -484,13 +465,7 @@ function ArticleTable() {
           👍 {selectedArticle.total_Likes || 0} &nbsp;&nbsp;&nbsp; 👀 {selectedArticle.views || 0}
         </Descriptions.Item> */}
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedArticle.status === "approved" ? "green" : "orange"
-                  }
-                >
-                  {selectedArticle.status.toUpperCase()}
-                </Tag>
+                <StatusBadge status={selectedArticle.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedArticle.createdBy?.displayName || "N/A"}

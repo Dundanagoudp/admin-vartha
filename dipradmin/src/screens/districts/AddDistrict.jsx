@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Button, Card, message } from "antd";
+import { Form, Input, Button, message } from "antd";
 import { createDistrict } from "../../service/districts/DistrictsApi";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 function AddDistrict() {
   const [form] = Form.useForm();
@@ -34,22 +36,15 @@ function AddDistrict() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#f6f7f9",
-        padding: 24,
-      }}
-    >
-      <Card
-        style={{ width: 520, boxShadow: "0 8px 24px rgba(0,0,0,0.06)" }}
-        styles={{ body: { padding: 24 } }}
-      >
-        <h2 style={{ marginBottom: 20 }}>Add New District</h2>
-
+    <div>
+      <PageHeader
+        title="Add New District"
+        breadcrumbs={[
+          { title: "Districts", path: "/districts" },
+          { title: "Add District" },
+        ]}
+      />
+      <FormCard style={{ maxWidth: 520 }}>
         <Form
           form={form}
           layout="vertical"
@@ -87,7 +82,7 @@ function AddDistrict() {
             </Button>
           </div>
         </Form>
-      </Card>
+      </FormCard>
     </div>
   );
 }

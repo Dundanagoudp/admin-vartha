@@ -18,6 +18,8 @@ import { storage } from "../../service/firebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getCategories } from "../../service/categories/CategoriesApi";
 import { uploadFileToAzureStorage } from "../../config/azurestorageservice";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -157,12 +159,16 @@ const handleVideoUpload = async ({ file }) => {
 
   return (
     <div>
-      <h1>Add New Video</h1>
+      <PageHeader
+        title="Add New Video"
+        breadcrumbs={[
+          { title: "Short Videos", path: "/manage-shortvideos" },
+          { title: "Add Video" },
+        ]}
+      />
+      <FormCard>
       <div
         style={{
-          maxWidth: "80vw",
-          margin: "auto",
-          padding: "20px",
           display: "flex",
           gap: "20px",
         }}
@@ -302,6 +308,7 @@ const handleVideoUpload = async ({ file }) => {
           </Form>
         </Card>
       </div>
+      </FormCard>
     </div>
   );
 }

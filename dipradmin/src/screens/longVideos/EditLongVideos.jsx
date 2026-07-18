@@ -21,6 +21,8 @@ import {
 import { getCategories } from "../../service/categories/CategoriesApi";
 import { getVideoCategories } from "../../service/videoCategory/VideoCategoryApi";
 import { uploadFileToAzureStorage } from "../../config/azurestorageservice"; // ✅ Azure uploader
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -268,15 +270,17 @@ function EditLongVideos() {
 
   return (
     <div>
-      <div>
-        <h1>Edit Long Video</h1>
-      </div>
+      <PageHeader
+        title="Edit Long Video"
+        breadcrumbs={[
+          { title: "Long Videos", path: "/manage-longvideo" },
+          { title: "Edit Video" },
+        ]}
+      />
 
+      <FormCard>
       <div
         style={{
-          maxWidth: "80vw",
-          margin: "auto",
-          padding: "20px",
           display: "flex",
           gap: "20px",
         }}
@@ -418,6 +422,7 @@ function EditLongVideos() {
           </Form>
         </Card>
       </div>
+      </FormCard>
     </div>
   );
 }

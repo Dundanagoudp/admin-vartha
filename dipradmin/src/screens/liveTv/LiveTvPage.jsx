@@ -22,8 +22,6 @@ import {
 } from "../../service/liveTv/LiveTvService";
 import {
   Page,
-  HeaderRow,
-  HeaderCopy,
   StatusRow,
   Grid,
   Panel,
@@ -35,8 +33,9 @@ import {
   Hint,
   ThumbPlay,
 } from "./LiveTvPage.Styles";
+import PageHeader from "../../components/ui/PageHeader";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 
 function extractYoutubeId(input) {
@@ -186,22 +185,22 @@ export default function LiveTvPage() {
 
   return (
     <Page>
-      <HeaderRow>
-        <HeaderCopy>
-          <Title level={3}>Live TV</Title>
-          <Text type="secondary">
-            Paste a YouTube Live URL, preview it here, then publish to the
-            website.
-          </Text>
-        </HeaderCopy>
-        <Button
-          icon={<ReloadOutlined />}
-          onClick={loadLiveTv}
-          loading={loading}
-        >
-          Refresh
-        </Button>
-      </HeaderRow>
+      <PageHeader
+        title="Live TV"
+        breadcrumbs={[{ title: "Live TV" }]}
+        extra={
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={loadLiveTv}
+            loading={loading}
+          >
+            Refresh
+          </Button>
+        }
+      />
+      <Text type="secondary" style={{ display: "block", marginTop: -8, marginBottom: 16 }}>
+        Paste a YouTube Live URL, preview it here, then publish to the website.
+      </Text>
 
       <Grid>
         <Panel>

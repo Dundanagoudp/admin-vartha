@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  Button,
   Image,
   Popconfirm,
   message,
   Modal,
-  Typography,
-  Input,
   Space,
-  Tag,
   Descriptions,
   Select,
 } from "antd";
@@ -19,15 +14,13 @@ import {
   approveMagazine2,
   getMagazineHistoryById,
 } from "../../service/Magazine/MagazineService2";
-import {
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  CheckOutlined,
-} from "@ant-design/icons";
+import { Eye, Pencil, Trash2, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getMagazineByYearMarchofKarnataka } from "../../service/Magazine/MagazineService2";
+import DataTableShell from "../ui/DataTableShell";
+import SearchBar from "../ui/SearchBar";
+import StatusBadge from "../ui/StatusBadge";
+import { IconActionBtn } from "../ui/ui.styles";
 
 const { Option } = Select;
 
@@ -138,11 +131,11 @@ function MagazineTable() {
     }
   };
 
-  const handleSearch = (e) => {
-    const value = e.target.value.toLowerCase();
+  const handleSearch = (value) => {
     setSearchText(value);
+    const q = (value || "").toLowerCase();
     const filtered = magazines.filter((magazine) =>
-      magazine.title.toLowerCase().includes(value)
+      magazine.title.toLowerCase().includes(q)
     );
     setFilteredMagazines(filtered);
   };
@@ -239,19 +232,21 @@ function MagazineTable() {
       dataIndex: "status",
       key: "status",
       render: (status, record) => (
-        <Tag
-          color={status === "approved" ? "green" : "orange"}
+        <div
+          onClick={() => handleStatusClick(record)}
           style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
             cursor:
               userRole === "admin" && status !== "approved"
                 ? "pointer"
                 : "default",
           }}
-          onClick={() => handleStatusClick(record)}
         >
-          {status.toUpperCase()}
-          {userRole === "admin" && status === "pending" && <CheckOutlined />}
-        </Tag>
+          <StatusBadge status={status} />
+          {userRole === "admin" && status === "pending" && <Check size={14} />}
+        </div>
       ),
     },
     {
@@ -259,16 +254,12 @@ function MagazineTable() {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button
-            type="default"
-            icon={<EyeOutlined />}
-            onClick={() => handleView(record)}
-          />
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record._id)}
-          />
+          <IconActionBtn type="button" title="View" onClick={() => handleView(record)}>
+            <Eye size={16} />
+          </IconActionBtn>
+          <IconActionBtn type="button" title="Edit" onClick={() => handleEdit(record._id)}>
+            <Pencil size={16} />
+          </IconActionBtn>
           {(userRole === "admin" ||
             (userRole === "moderator" &&
               record.createdBy?._id === localStorage.getItem("userId"))) && (
@@ -278,7 +269,9 @@ function MagazineTable() {
               okText="Yes"
               cancelText="No"
             >
-              <Button danger icon={<DeleteOutlined />} />
+              <IconActionBtn type="button" title="Delete" $danger>
+                <Trash2 size={16} />
+              </IconActionBtn>
             </Popconfirm>
           )}
         </Space>
@@ -288,41 +281,36 @@ function MagazineTable() {
 
   return (
     <>
-      {/* ✅ Search + Year Dropdown */}
-      <Space
-        style={{ display: "flex", justifyContent: "right", marginBottom: 16 }}
-      >
-        <Select
-          placeholder="Select Year"
-          style={{ width: 150 }}
-          value={selectedYear}
-          onChange={handleYearChange}
-          allowClear
-        >
-          <Option value={null}>All Years</Option>
-          {uniqueYears.map((year) => (
-            <Option key={year} value={year}>
-              {year}
-            </Option>
-          ))}
-        </Select>
-
-        <Input
-          placeholder="Search by Title"
-          value={searchText}
-          onChange={handleSearch}
-          prefix={<SearchOutlined />}
-          allowClear
-          style={{ width: 250 }}
-        />
-      </Space>
-
-      <Table
+      <DataTableShell
+        toolbar={
+          <Space wrap>
+            <Select
+              placeholder="Select Year"
+              style={{ width: 150 }}
+              value={selectedYear}
+              onChange={handleYearChange}
+              allowClear
+            >
+              <Option value={null}>All Years</Option>
+              {uniqueYears.map((year) => (
+                <Option key={year} value={year}>
+                  {year}
+                </Option>
+              ))}
+            </Select>
+            <SearchBar
+              placeholder="Search by Title"
+              value={searchText}
+              onChange={handleSearch}
+            />
+          </Space>
+        }
         dataSource={filteredMagazines}
         columns={columns}
         loading={loading}
         rowKey="_id"
         pagination={{ pageSize: 10 }}
+        emptyTitle="No magazines found"
       />
 
       {/* View Modal */}
@@ -353,13 +341,7 @@ function MagazineTable() {
                 {new Date(selectedMagazine.createdTime).toLocaleDateString()}
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedMagazine.status === "approved" ? "green" : "orange"
-                  }
-                >
-                  {selectedMagazine.status.toUpperCase()}
-                </Tag>
+                <StatusBadge status={selectedMagazine.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Published month">
                 {selectedMagazine.publishedMonth || "N/A"}
@@ -418,13 +400,7 @@ function MagazineTable() {
                 {new Date(selectedMagazine.createdTime).toLocaleDateString()}
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedMagazine.status === "approved" ? "green" : "orange"
-                  }
-                >
-                  {selectedMagazine.status.toUpperCase()}
-                </Tag>
+                <StatusBadge status={selectedMagazine.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedMagazine.createdBy?.displayName || "N/A"}

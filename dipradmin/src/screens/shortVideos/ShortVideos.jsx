@@ -4,6 +4,7 @@ import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ShortVideosTable from "../../components/shortVideos/ShortVideosTable";
+import PageHeader from "../../components/ui/PageHeader";
 
 function ShortVideosPage() {
   const navigate = useNavigate();
@@ -13,17 +14,19 @@ function ShortVideosPage() {
   };
   return (
     <ShortVideosWrapper>
-      <div className="header-section">
-        <div className="block-title">Short Videos</div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          className="add-article-btn"
-          onClick={handleAddClick}
-        >
-          Add Short Video
-        </Button>
-      </div>
+      <PageHeader
+        title="Short Videos"
+        breadcrumbs={[{ title: "Videos" }]}
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddClick}
+          >
+            Add Short Video
+          </Button>
+        }
+      />
       <div className="block-table">
         <ShortVideosTable />
       </div>

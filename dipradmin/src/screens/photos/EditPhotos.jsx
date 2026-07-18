@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Upload, message, Input, Form, Typography, Spin, Select } from "antd";
+import { Button, Upload, message, Input, Form, Typography, Spin, Select } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import { uploadFileToAzureStorage } from "../../config/azurestorageservice";
 import { getPhotosById, updatePhotos } from "../../service/Photos/photosService";
 import { getPhotoCategories } from "../../service/photoCategory/PhotoCategoryApi";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 function EditPhotos() {
@@ -169,23 +171,15 @@ function EditPhotos() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#f6f7f9",
-        padding: 24,
-      }}
-    >
-      <Card
-        style={{ width: 520, boxShadow: "0 8px 24px rgba(0,0,0,0.06)" }}
-        styles={{ body: { padding: 24 } }}
-      >
-        <Title level={4} style={{ marginBottom: 4 }}>
-          Edit Photo
-        </Title>
+    <div>
+      <PageHeader
+        title="Edit Photo"
+        breadcrumbs={[
+          { title: "Photos", path: "/manage-photos" },
+          { title: "Edit Photo" },
+        ]}
+      />
+      <FormCard style={{ maxWidth: 520 }}>
         <Text type="secondary">Update the photo title and image.</Text>
 
         <Form
@@ -289,7 +283,7 @@ function EditPhotos() {
             </Button>
           </div>
         </Form>
-      </Card>
+      </FormCard>
     </div>
   );
 }

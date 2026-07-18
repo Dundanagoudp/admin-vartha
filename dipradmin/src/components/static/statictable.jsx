@@ -1,32 +1,27 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
   Button,
   Popconfirm,
   message,
   Space,
-  Tag,
   Modal,
   Typography,
   Descriptions,
   Tooltip,
   Image,
 } from "antd";
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  CheckOutlined,
-  EditOutlined,
-  LinkOutlined,
-} from "@ant-design/icons";
+import { Eye, Trash2, Check, ExternalLink } from "lucide-react";
 import {
   getAllStatic,
   deleteStaticById,
   approveStaticById,
 } from "../../service/Static/StaticService";
 import { useNavigate } from "react-router-dom";
+import DataTableShell from "../ui/DataTableShell";
+import StatusBadge from "../ui/StatusBadge";
+import { IconActionBtn } from "../ui/ui.styles";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 function StaticTable() {
   const [staticPages, setStaticPages] = useState([]);
@@ -152,7 +147,7 @@ function StaticTable() {
       render: (text) => (
         <Button
           type="link"
-          icon={<LinkOutlined />}
+          icon={<ExternalLink size={14} />}
           onClick={() => handleLinkClick(text)}
           style={{ padding: 0 }}
         >
@@ -171,25 +166,23 @@ function StaticTable() {
       dataIndex: "status",
       key: "status",
       render: (status, record) => (
-        <Tag
-          color={status === "approved" ? "green" : "orange"}
-          style={{
-            cursor:
-              role === "admin" && status !== "approved" ? "pointer" : "default",
-          }}
+        <div
           onClick={() =>
             role === "admin" &&
             status !== "approved" &&
             handleApproveClick(record)
           }
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            cursor:
+              role === "admin" && status !== "approved" ? "pointer" : "default",
+          }}
         >
-          {status.toUpperCase()}
-          {role === "admin" && status !== "approved" && (
-            <span style={{ marginLeft: 5 }}>
-              <CheckOutlined />
-            </span>
-          )}
-        </Tag>
+          <StatusBadge status={status} />
+          {role === "admin" && status !== "approved" && <Check size={14} />}
+        </div>
       ),
     },
     {
@@ -213,23 +206,10 @@ function StaticTable() {
       render: (_, record) => (
         <Space>
           <Tooltip title="View">
-            <Button
-              type="default"
-              icon={<EyeOutlined />}
-              onClick={() => handleView(record)}
-            />
+            <IconActionBtn type="button" title="View" onClick={() => handleView(record)}>
+              <Eye size={16} />
+            </IconActionBtn>
           </Tooltip>
-{/* 
-          {(role === "admin" || role === "moderator") && (
-            <Tooltip title="Edit">
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => handleEdit(record)}
-              />
-            </Tooltip>
-          )} */}
-
           {(role === "admin" ||
             (role === "moderator" && record.createdBy?._id === userId)) && (
             <Tooltip title="Delete">
@@ -240,7 +220,9 @@ function StaticTable() {
                 cancelText="No"
                 okType="danger"
               >
-                <Button danger icon={<DeleteOutlined />} />
+                <IconActionBtn type="button" title="Delete" $danger>
+                  <Trash2 size={16} />
+                </IconActionBtn>
               </Popconfirm>
             </Tooltip>
           )}
@@ -250,19 +232,8 @@ function StaticTable() {
   ];
 
   return (
-    <div style={{ padding: "20px" }}>
-      <div
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Title level={2}>Static Pages Management</Title>
-      </div>
-
-      <Table
+    <div>
+      <DataTableShell
         columns={columns}
         dataSource={staticPages.map((staticPage) => ({
           ...staticPage,
@@ -272,12 +243,11 @@ function StaticTable() {
         rowKey="_id"
         pagination={{
           pageSize: 6,
-        //   showSizeChanger: true,
-        //   showQuickJumper: true,
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} of ${total} items`,
         }}
         scroll={{ x: 800 }}
+        emptyTitle="No static pages found"
       />
 
       {/* View Static Page Modal */}
@@ -306,19 +276,7 @@ function StaticTable() {
 
             <Descriptions bordered column={1}>
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedStatic.status === "approved"
-                      ? "green"
-                      : selectedStatic.status === "rejected"
-                      ? "red"
-                      : "orange"
-                  }
-                >
-                  {selectedStatic.status
-                    ? selectedStatic.status.toUpperCase()
-                    : "UNKNOWN"}
-                </Tag>
+                <StatusBadge status={selectedStatic.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedStatic.createdBy?.displayName ||
@@ -371,7 +329,7 @@ function StaticTable() {
             <div style={{ textAlign: "center", marginBottom: 20 }}>
               <Button
                 type="primary"
-                icon={<LinkOutlined />}
+                icon={<ExternalLink size={16} />}
                 onClick={() => handleLinkClick(selectedStatic.staticpageLink)}
                 size="large"
               >
@@ -381,7 +339,7 @@ function StaticTable() {
 
             <Descriptions bordered column={1} size="middle">
               <Descriptions.Item label="Current Status">
-                <Tag color="orange">PENDING</Tag>
+                <StatusBadge status="pending" />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedStatic.createdBy?.displayName ||

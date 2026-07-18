@@ -5,9 +5,6 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { ThemeProvider } from "styled-components";
-import { theme } from "./styles/theme/theme";
-import { GlobalStyles } from "./styles/global/GlobalStyles";
 import BaseLayout from "./components/layout/BaseLayout";
 import DashboardPage from "./screens/dashboard/DashboardPage";
 import ManageUsers from "./screens/manageusers/ManageUsers";
@@ -88,8 +85,6 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyles />
       <Router>
         <Routes>
           {/* Redirect root path to /login */}
@@ -546,7 +541,6 @@ function App() {
           
         </Routes>
       </Router>
-    </ThemeProvider>
   );
 }
 

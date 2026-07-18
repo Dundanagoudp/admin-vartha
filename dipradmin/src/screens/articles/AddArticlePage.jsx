@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { uploadFileToAzureStorage } from "../../config/azurestorageservice";
 import { getCategories } from "../../service/categories/CategoriesApi";
 import { getDistricts } from "../../service/districts/DistrictsApi";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -151,12 +153,16 @@ function AddArticlePage() {
 
   return (
     <div>
-      <h1>Add New Article</h1>
+      <PageHeader
+        title="Add New Article"
+        breadcrumbs={[
+          { title: "Articles", path: "/manage-articles" },
+          { title: "Add Article" },
+        ]}
+      />
+      <FormCard>
       <div
         style={{
-          maxWidth: "80vw",
-          margin: "auto",
-          padding: "20px",
           display: "flex",
           gap: "20px",
         }}
@@ -299,6 +305,7 @@ function AddArticlePage() {
           </Form>
         </Card>
       </div>
+      </FormCard>
     </div>
   );
 }

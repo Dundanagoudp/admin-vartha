@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, message, Space, Modal, Descriptions, Popconfirm } from "antd";
-import { EyeOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { message, Space, Modal, Descriptions, Popconfirm } from "antd";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getDistricts, deleteDistrict } from "../../service/districts/DistrictsApi";
+import DataTableShell from "../../components/ui/DataTableShell";
+import { IconActionBtn } from "../../components/ui/ui.styles";
 
 function DistrictsTable() {
   const navigate = useNavigate();
@@ -20,10 +22,13 @@ function DistrictsTable() {
       setLoading(true);
       const response = await getDistricts();
 
-      if (response?.success && response?.data?.districts && Array.isArray(response.data.districts)) {
+      if (response?.success && Array.isArray(response?.data?.districts)) {
         setDistricts(response.data.districts);
+      } else if (Array.isArray(response?.data)) {
+        setDistricts(response.data);
       } else {
-        message.error("Failed to load districts");
+        setDistricts([]);
+        message.error(response?.message || "Failed to load districts");
       }
     } catch (error) {
       message.error("Error fetching districts");
@@ -104,20 +109,16 @@ function DistrictsTable() {
         const recordId = typeof record._id === 'object' && record._id?.$oid ? record._id.$oid : record._id;
         return (
           <Space>
-            <Button
-              type="default"
-              icon={<EyeOutlined />}
-              onClick={() => handleView(record)}
-            >
-              View
-            </Button>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
+            <IconActionBtn type="button" title="View" onClick={() => handleView(record)}>
+              <Eye size={16} />
+            </IconActionBtn>
+            <IconActionBtn
+              type="button"
+              title="Edit"
               onClick={() => navigate(`/districts/edit/${recordId}`)}
             >
-              Edit
-            </Button>
+              <Pencil size={16} />
+            </IconActionBtn>
             <Popconfirm
               title="Are you sure to delete this district?"
               onConfirm={() => handleDelete(recordId)}
@@ -125,9 +126,9 @@ function DistrictsTable() {
               cancelText="No"
               okType="danger"
             >
-              <Button danger icon={<DeleteOutlined />}>
-                Delete
-              </Button>
+              <IconActionBtn type="button" title="Delete" $danger>
+                <Trash2 size={16} />
+              </IconActionBtn>
             </Popconfirm>
           </Space>
         );
@@ -137,7 +138,7 @@ function DistrictsTable() {
 
   return (
     <div>
-      <Table
+      <DataTableShell
         columns={columns}
         dataSource={districts.map((district) => {
           const id = typeof district._id === 'object' && district._id?.$oid ? district._id.$oid : district._id;
@@ -149,6 +150,7 @@ function DistrictsTable() {
           return id;
         }}
         pagination={{ pageSize: 10 }}
+        emptyTitle="No districts found"
       />
 
       <Modal

@@ -1,11 +1,10 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Plus } from "lucide-react";
 import { StaticWrapper } from "../../screens/static/static.style";
 import StaticTable from "../../components/static/statictable";
-// import PhotosTable from "../../components/photos/photostable";
-// import BannersTable from "../../components/banners/BannersTable";
+import PageHeader from "../../components/ui/PageHeader";
 
 function StaticPage() {
   const navigate = useNavigate();
@@ -16,20 +15,20 @@ function StaticPage() {
 
   return (
     <StaticWrapper>
-      <div className="header-section">
-        <div className="block-title">Websites</div>
+      <PageHeader
+        title="Websites"
+        breadcrumbs={[{ title: "Websites" }]}
+        extra={
+          <Button
+            type="primary"
+            icon={<Plus size={16} />}
+            onClick={handleAddBannerClick}
+          >
+            Add Websites
+          </Button>
+        }
+      />
 
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          className="add-article-btn"
-          onClick={handleAddBannerClick}
-        >
-          Add Websites
-        </Button>
-      </div>
-
-      {/* Banners Table */}
       <div className="block-Table">
         <StaticTable />
       </div>

@@ -1,31 +1,23 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  Button,
   Popconfirm,
   message,
   Image,
   Space,
-  Tag,
   Modal,
-  Typography,
   Descriptions,
   Tooltip,
 } from "antd";
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  CheckOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
+import { Eye, Pencil, Trash2, Check } from "lucide-react";
 import {
   getAllPhotos,
   deletePhotosById,
   approvePhotosById,
 } from "../../service/Photos/photosService";
 import { useNavigate } from "react-router-dom";
-
-const { Title, Text } = Typography;
+import DataTableShell from "../ui/DataTableShell";
+import StatusBadge from "../ui/StatusBadge";
+import { IconActionBtn } from "../ui/ui.styles";
 
 function PhotosTable() {
   const [photos, setPhotos] = useState([]);
@@ -156,25 +148,23 @@ const fetchPhotos = async () => {
       dataIndex: "status",
       key: "status",
       render: (status, record) => (
-        <Tag
-          color={status === "approved" ? "green" : "orange"}
-          style={{
-            cursor:
-              role === "admin" && status !== "approved" ? "pointer" : "default",
-          }}
+        <div
           onClick={() =>
             role === "admin" &&
             status !== "approved" &&
             handleApproveClick(record)
           }
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            cursor:
+              role === "admin" && status !== "approved" ? "pointer" : "default",
+          }}
         >
-          {status.toUpperCase()}
-          {role === "admin" && status !== "approved" && (
-            <span style={{ marginLeft: 5 }}>
-              <CheckOutlined />
-            </span>
-          )}
-        </Tag>
+          <StatusBadge status={status} />
+          {role === "admin" && status !== "approved" && <Check size={14} />}
+        </div>
       ),
     },
     {
@@ -198,23 +188,17 @@ const fetchPhotos = async () => {
       render: (_, record) => (
         <Space>
           <Tooltip title="View">
-            <Button
-              type="default"
-              icon={<EyeOutlined />}
-              onClick={() => handleView(record)}
-            />
+            <IconActionBtn type="button" title="View" onClick={() => handleView(record)}>
+              <Eye size={16} />
+            </IconActionBtn>
           </Tooltip>
-
           {(role === "admin" || role === "moderator") && (
             <Tooltip title="Edit">
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => handleEdit(record)}
-              />
+              <IconActionBtn type="button" title="Edit" onClick={() => handleEdit(record)}>
+                <Pencil size={16} />
+              </IconActionBtn>
             </Tooltip>
           )}
-
           {(role === "admin" ||
             (role === "moderator" && record.createdBy?._id === userId)) && (
             <Tooltip title="Delete">
@@ -225,7 +209,9 @@ const fetchPhotos = async () => {
                 cancelText="No"
                 okType="danger"
               >
-                <Button danger icon={<DeleteOutlined />} />
+                <IconActionBtn type="button" title="Delete" $danger>
+                  <Trash2 size={16} />
+                </IconActionBtn>
               </Popconfirm>
             </Tooltip>
           )}
@@ -235,34 +221,19 @@ const fetchPhotos = async () => {
   ];
 
   return (
-    <div style={{ padding: "20px" }}>
-      <div
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        {/* <Title level={2}>Photos Management</Title> */}
-        {/* <Button type="primary" onClick={fetchPhotos} loading={loading}>
-          Refresh
-        </Button> */}
-      </div>
-
-      <Table
+    <div>
+      <DataTableShell
         columns={columns}
         dataSource={photos.map((photo) => ({ ...photo, key: photo._id }))}
         loading={loading}
         rowKey="_id"
         pagination={{
           pageSize: 5,
-          // showSizeChanger: true,
-          // showQuickJumper: true,
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} of ${total} items`,
         }}
         scroll={{ x: 800 }}
+        emptyTitle="No photos found"
       />
 
       {/* View Photo Modal */}
@@ -290,19 +261,7 @@ const fetchPhotos = async () => {
             />
             <Descriptions bordered column={1}>
               <Descriptions.Item label="Status">
-                <Tag
-                  color={
-                    selectedPhoto.status === "approved"
-                      ? "green"
-                      : selectedPhoto.status === "rejected"
-                      ? "red"
-                      : "orange"
-                  }
-                >
-                  {selectedPhoto.status
-                    ? selectedPhoto.status.toUpperCase()
-                    : "UNKNOWN"}
-                </Tag>
+                <StatusBadge status={selectedPhoto.status} />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedPhoto.createdBy?.displayName ||
@@ -355,7 +314,7 @@ const fetchPhotos = async () => {
 
             <Descriptions bordered column={1} size="middle">
               <Descriptions.Item label="Current Status">
-                <Tag color="orange">PENDING</Tag>
+                <StatusBadge status="pending" />
               </Descriptions.Item>
               <Descriptions.Item label="Created By">
                 {selectedPhoto.createdBy?.displayName ||

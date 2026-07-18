@@ -1,157 +1,188 @@
 import React, { useEffect, useState } from "react";
-import { Card, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import {
-  UserOutlined,
-  FileTextOutlined,
-  BookOutlined,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
-
+  Users,
+  Newspaper,
+  BookOpen,
+  Film,
+  Images,
+  Eye,
+  Clock3,
+  CheckCircle2,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   getTotalUsers,
   getTotalArticles,
   getTotalMagazine,
   getTotalVideos,
 } from "../../../service/Dashboard/Dashboardapi";
-import { Navigate, useNavigate } from "react-router-dom";
+import { getTotalVisitors } from "../../../service/statsService/statsService";
+import { getAllPhotos } from "../../../service/Photos/photosService";
+import { getArticles } from "../../../service/Article/ArticleService";
+import StatsCardUI from "../../ui/StatsCard";
+import { StatsSkeleton } from "../../ui/LoadingSkeleton";
+
+function isToday(dateLike) {
+  if (!dateLike) return false;
+  const d = new Date(dateLike);
+  if (Number.isNaN(d.getTime())) return false;
+  const now = new Date();
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  );
+}
 
 function StatsCard() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalArticles: 0,
     totalMagazines: 0,
     totalVideos: 0,
+    totalPhotos: null,
+    totalVisitors: null,
+    pendingApproval: null,
+    publishedToday: null,
   });
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [users, articles, magazines, videos] = await Promise.all([
-          getTotalUsers(),
-          getTotalArticles(),
-          getTotalMagazine(),
-          getTotalVideos(),
-        ]);
-console.log("Total Users:", users, "Total Articles:", articles, "Total Magazines:", magazines, "Total Videos:", videos); 
+        const [users, articles, magazines, videos, visitors, photos, news] =
+          await Promise.all([
+            getTotalUsers().catch(() => null),
+            getTotalArticles().catch(() => null),
+            getTotalMagazine().catch(() => null),
+            getTotalVideos().catch(() => null),
+            getTotalVisitors().catch(() => null),
+            getAllPhotos().catch(() => null),
+            getArticles().catch(() => null),
+          ]);
+
+        const newsList = Array.isArray(news?.data)
+          ? news.data
+          : Array.isArray(news)
+            ? news
+            : [];
+
+        const pending = newsList.filter((n) => {
+          const s = String(n.status || n.approvalStatus || "").toLowerCase();
+          return s.includes("pending");
+        }).length;
+
+        const publishedToday = newsList.filter((n) => {
+          const s = String(n.status || "").toLowerCase();
+          const published =
+            s.includes("publish") ||
+            s.includes("approv") ||
+            n.isPublished === true;
+          return published && isToday(n.publishedAt || n.updatedAt || n.createdAt);
+        }).length;
+
+        const photoCount = Array.isArray(photos?.data)
+          ? photos.data.length
+          : Array.isArray(photos)
+            ? photos.length
+            : null;
 
         setStats({
-          totalUsers: users.totalUsers || 0,
-          totalArticles: articles.data || 0,
-          totalMagazines: magazines.data || 0,
-          totalVideos: videos.data || 0,
+          totalUsers: users?.totalUsers ?? 0,
+          totalArticles: articles?.data ?? 0,
+          totalMagazines: magazines?.data ?? 0,
+          totalVideos: videos?.data ?? 0,
+          totalPhotos: photoCount,
+          totalVisitors: visitors?.totalVisits ?? null,
+          pendingApproval: newsList.length ? pending : null,
+          publishedToday: newsList.length ? publishedToday : null,
         });
       } catch (error) {
         console.error("Error fetching stats:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStats();
   }, []);
 
-  const cardData = [
+  if (loading) return <StatsSkeleton count={8} />;
+
+  const cards = [
     {
-      title: "Total Users",
-      icon: <UserOutlined style={{ fontSize: "36px", color: "#1890ff" }} />,
-      content: stats.totalUsers,
-      onclick: () => {
-        navigate("/manage-users");
-      },
+      label: "Total Users",
+      value: stats.totalUsers,
+      subtitle: "Registered officers",
+      icon: <Users size={20} />,
+      accent: "#005BAC",
+      onClick: () => navigate("/manage-users"),
     },
     {
-      title: "Total Articles",
-      icon: <FileTextOutlined style={{ fontSize: "36px", color: "#52c41a" }} />,
-      content: stats.totalArticles,
-      onclick: () => {
-        navigate("/manage-articles");
-      }
+      label: "Total Articles",
+      value: stats.totalArticles,
+      subtitle: "All news items",
+      icon: <Newspaper size={20} />,
+      accent: "#16A34A",
+      onClick: () => navigate("/manage-articles"),
     },
     {
-      title: "Total Magazines",
-      icon: <BookOutlined style={{ fontSize: "36px", color: "#faad14" }} />,
-      content: stats.totalMagazines,
-      onclick: () => {
-        navigate("/manage-varthajanapada");
-      }
+      label: "Total Magazines",
+      value: stats.totalMagazines,
+      subtitle: "Vartha & March",
+      icon: <BookOpen size={20} />,
+      accent: "#F59E0B",
+      onClick: () => navigate("/manage-varthajanapada"),
     },
     {
-      title: "Total Videos",
-      icon: (
-        <VideoCameraOutlined style={{ fontSize: "36px", color: "#eb2f96" }} />
-      ),
-      content: stats.totalVideos,
-      onclick: () => {
-        navigate("/manage-shortvideos");
-      }
+      label: "Total Videos",
+      value: stats.totalVideos,
+      subtitle: "Short & long videos",
+      icon: <Film size={20} />,
+      accent: "#005BAC",
+      onClick: () => navigate("/manage-longvideo"),
+    },
+    {
+      label: "Total Photos",
+      value: stats.totalPhotos ?? "—",
+      subtitle: stats.totalPhotos == null ? "Unavailable" : "Gallery items",
+      icon: <Images size={20} />,
+      accent: "#16A34A",
+      onClick: () => navigate("/manage-photos"),
+    },
+    {
+      label: "Website Visitors",
+      value: stats.totalVisitors ?? "—",
+      subtitle: stats.totalVisitors == null ? "Unavailable" : "Total visits",
+      icon: <Eye size={20} />,
+      accent: "#005BAC",
+    },
+    {
+      label: "Pending Approval",
+      value: stats.pendingApproval ?? "—",
+      subtitle:
+        stats.pendingApproval == null ? "Unavailable" : "Awaiting review",
+      icon: <Clock3 size={20} />,
+      accent: "#F59E0B",
+      onClick: () => navigate("/manage-articles"),
+    },
+    {
+      label: "Published Today",
+      value: stats.publishedToday ?? "—",
+      subtitle:
+        stats.publishedToday == null ? "Unavailable" : "Articles today",
+      icon: <CheckCircle2 size={20} />,
+      accent: "#16A34A",
     },
   ];
 
   return (
-    <Row gutter={24} style={{ marginTop: "20px" }}>
-      {cardData.map((item, index) => (
-        <Col key={index} span={6}>
-          {/* <Card
-            bordered={false}
-            style={{
-              textAlign: "center",
-              borderRadius: "12px",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <div>{item.icon}</div>
-            <h2
-              style={{
-                marginTop: "10px",
-                fontSize: "18px",
-                fontWeight: "bold",
-              }}
-            >
-              {item.title}
-            </h2>
-            <p
-              style={{
-                fontSize: "22px",
-                fontWeight: "600",
-                marginTop: "10px",
-                color: "#333",
-              }}
-            >
-              {item.content}
-            </p>
-          </Card>
-           */}
-          <Card
-            bordered={false}
-            className="stat-card"
-            style={{
-              textAlign: "center",
-              borderRadius: "12px",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-            }}
-             onClick={item.onclick}
-          >
-            <div>{item.icon}</div>
-            <h2
-              style={{
-                marginTop: "10px",
-                fontSize: "18px",
-                fontWeight: "bold",
-              }}
-            >
-              {item.title}
-            </h2>
-            <p
-              style={{
-                fontSize: "22px",
-                fontWeight: "600",
-                marginTop: "10px",
-                color: "#333",
-              }}
-            >
-              {item.content}
-            </p>
-          </Card>
+    <Row gutter={[16, 16]}>
+      {cards.map((card) => (
+        <Col key={card.label} xs={24} sm={12} lg={6}>
+          <StatsCardUI {...card} />
         </Col>
       ))}
     </Row>

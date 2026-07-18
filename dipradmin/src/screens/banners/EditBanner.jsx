@@ -6,7 +6,6 @@ import {
   Card,
   Upload,
   message,
-  Typography,
   Select
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
@@ -15,9 +14,10 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getBannerById, updateBannerById } from "../../service/Banner/BannersService";
 import { useNavigate, useParams } from "react-router-dom";
 import { uploadFileToAzureStorage } from "../../config/azurestorageservice";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
-const { Title } = Typography;
 
 function EditBannerPage() {
   const [form] = Form.useForm();
@@ -127,12 +127,16 @@ function EditBannerPage() {
 
   return (
     <div>
-      <Title level={2}>Edit Banner</Title>
+      <PageHeader
+        title="Edit Banner"
+        breadcrumbs={[
+          { title: "Banners", path: "/manage-banners" },
+          { title: "Edit Banner" },
+        ]}
+      />
+      <FormCard>
       <div
         style={{
-          maxWidth: "80vw",
-          margin: "auto",
-          padding: "20px",
           display: "flex",
           gap: "20px",
         }}
@@ -201,6 +205,7 @@ function EditBannerPage() {
           </Form>
         </Card>
       </div>
+      </FormCard>
     </div>
   );
 }

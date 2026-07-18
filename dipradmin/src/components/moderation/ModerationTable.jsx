@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Space, message, Modal } from "antd";
+import { Space, message, Modal } from "antd";
 import {
   getAllComments,
   deleteComment,
 } from "../../service/Comments/CommentService";
-import { SearchOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Trash2 } from "lucide-react";
+import DataTableShell from "../ui/DataTableShell";
+import SearchBar from "../ui/SearchBar";
+import { IconActionBtn } from "../ui/ui.styles";
 
 function ModerationTable() {
   const [commentsData, setCommentsData] = useState([]);
@@ -150,11 +153,14 @@ function ModerationTable() {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
-          <Button
-            danger
-            icon={<DeleteOutlined />}
+          <IconActionBtn
+            type="button"
+            title="Delete"
+            $danger
             onClick={() => handleDelete(record.key)}
-          />
+          >
+            <Trash2 size={16} />
+          </IconActionBtn>
         </Space>
       ),
     },
@@ -162,24 +168,19 @@ function ModerationTable() {
 
   return (
     <div>
-      {/* 🔎 Search Bar */}
-      <Space style={{ marginBottom: 16 }}>
-        <Input
-          placeholder="Search by user, comment, news, or video"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          allowClear
-          prefix={<SearchOutlined />}
-          style={{ width: 300 }}
-        />
-      </Space>
-
-      {/* 🧾 Comments Table */}
-      <Table
+      <DataTableShell
+        toolbar={
+          <SearchBar
+            placeholder="Search by user, comment, news, or video"
+            value={searchText}
+            onChange={setSearchText}
+            style={{ maxWidth: 360, marginLeft: "auto" }}
+          />
+        }
         columns={columns}
         dataSource={filteredData}
         pagination={{ pageSize: 10 }}
-        bordered
+        emptyTitle="No comments found"
       />
     </div>
   );

@@ -2,21 +2,22 @@ import React, { useMemo } from "react";
 import { Menu, Button, Modal, Typography } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  HomeOutlined,
-  UserOutlined,
-  BookOutlined,
-  CommentOutlined,
-  LogoutOutlined,
-} from "@ant-design/icons";
-import { FaPhotoVideo, FaRegNewspaper, FaRegComments } from "react-icons/fa";
-import { RiVideoOnLine, RiVideoOnFill } from "react-icons/ri";
-import {
-  MdOutlineWebStories,
-  MdOutlineEditNotifications,
-  MdLiveTv,
-} from "react-icons/md";
-import { TbCategoryFilled } from "react-icons/tb";
-import { HiOutlineLocationMarker } from "react-icons/hi";
+  LayoutDashboard,
+  Users,
+  Newspaper,
+  BookOpen,
+  Clapperboard,
+  Film,
+  Images,
+  Globe,
+  Bell,
+  Handshake,
+  Tv,
+  FolderOpen,
+  MapPin,
+  MessagesSquare,
+  LogOut,
+} from "lucide-react";
 import {
   SidebarRoot,
   BrandBlock,
@@ -29,7 +30,9 @@ import logoimage from "../../assets/Logo.png";
 
 const { Text } = Typography;
 
-const Sidebar = () => {
+const icon = (Icon) => <Icon size={18} strokeWidth={1.85} className="lucide" />;
+
+const Sidebar = ({ onNavigate }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -55,60 +58,57 @@ const Sidebar = () => {
     });
   };
 
+  const go = (key) => {
+    navigate(key);
+    onNavigate?.();
+  };
+
   const menuItems = useMemo(() => {
     const items = [];
 
     if (isAdminOrModerator) {
       items.push(
-        { key: "/dashboard", icon: <HomeOutlined />, label: "Dashboard" },
-        { key: "/manage-users", icon: <UserOutlined />, label: "Users" }
+        { key: "/dashboard", icon: icon(LayoutDashboard), label: "Dashboard" },
+        { key: "/manage-users", icon: icon(Users), label: "Users" }
       );
     }
 
     if (canViewContent) {
       items.push(
-        {
-          key: "/manage-articles",
-          icon: <FaRegNewspaper />,
-          label: "Articles",
-        },
+        { key: "/manage-articles", icon: icon(Newspaper), label: "Articles" },
         {
           key: "/manage-varthajanapada",
-          icon: <BookOutlined />,
+          icon: icon(BookOpen),
           label: "Vartha Janapada",
         },
         {
           key: "/manage-marchofkarnataka",
-          icon: <BookOutlined />,
+          icon: icon(BookOpen),
           label: "March of Karnataka",
         },
         {
           key: "/manage-shortvideos",
-          icon: <RiVideoOnLine />,
+          icon: icon(Clapperboard),
           label: "Short Videos",
         },
         {
           key: "/manage-longvideo",
-          icon: <RiVideoOnFill />,
+          icon: icon(Film),
           label: "Long Videos",
         },
-        { key: "/manage-photos", icon: <FaPhotoVideo />, label: "Photos" },
-        {
-          key: "/website-pages",
-          icon: <MdOutlineWebStories />,
-          label: "Websites",
-        },
+        { key: "/manage-photos", icon: icon(Images), label: "Photos" },
+        { key: "/website-pages", icon: icon(Globe), label: "Websites" },
         {
           key: "/latestnotification",
-          icon: <MdOutlineEditNotifications />,
+          icon: icon(Bell),
           label: "Latest Notification",
         },
         {
           key: "/ServiceNotification",
-          icon: <CommentOutlined />,
+          icon: icon(Handshake),
           label: "Our Services",
         },
-        { key: "/live-tv", icon: <MdLiveTv />, label: "Live TV" }
+        { key: "/live-tv", icon: icon(Tv), label: "Live TV" }
       );
     }
 
@@ -116,22 +116,18 @@ const Sidebar = () => {
       items.push(
         {
           key: "/video-categories",
-          icon: <TbCategoryFilled />,
+          icon: icon(FolderOpen),
           label: "Video Categories",
         },
         {
           key: "/photo-categories",
-          icon: <TbCategoryFilled />,
+          icon: icon(FolderOpen),
           label: "Photo Categories",
         },
-        {
-          key: "/districts",
-          icon: <HiOutlineLocationMarker />,
-          label: "Districts",
-        },
+        { key: "/districts", icon: icon(MapPin), label: "Districts" },
         {
           key: "/manage-moderation",
-          icon: <FaRegComments />,
+          icon: icon(MessagesSquare),
           label: "Comments",
         }
       );
@@ -156,7 +152,7 @@ const Sidebar = () => {
             Vartha Admin
           </Text>
           <Text type="secondary" className="brand-sub">
-            DIPR Content Panel
+            DIPR · Government of Karnataka
           </Text>
         </BrandTextWrap>
       </BrandBlock>
@@ -166,7 +162,7 @@ const Sidebar = () => {
           mode="inline"
           selectedKeys={[selectedKey]}
           items={menuItems}
-          onClick={({ key }) => navigate(key)}
+          onClick={({ key }) => go(key)}
         />
       </MenuScroll>
 
@@ -174,7 +170,7 @@ const Sidebar = () => {
         <Button
           danger
           block
-          icon={<LogoutOutlined />}
+          icon={<LogOut size={16} />}
           onClick={handleLogout}
           size="large"
         >

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Table,
   Button,
   message,
   Space,
@@ -8,17 +7,8 @@ import {
   Typography,
   Descriptions,
   Tooltip,
-  Input,
 } from "antd";
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  PlusOutlined,
-  LinkOutlined,
-  SearchOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+import { Eye, Pencil, Trash2, Plus, ExternalLink, RefreshCw } from "lucide-react";
 import {
   listNewArticles,
   deleteNewArticle,
@@ -26,16 +16,17 @@ import {
 import { useNavigate } from "react-router-dom";
 import {
   NotificationWrapper,
-  HeaderRow,
-  Toolbar,
-  TableCard,
   TitleCell,
   LinkCell,
   MetaChip,
   CountText,
 } from "./Notification.styles";
+import PageHeader from "../ui/PageHeader";
+import DataTableShell from "../ui/DataTableShell";
+import SearchBar from "../ui/SearchBar";
+import { IconActionBtn } from "../ui/ui.styles";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 function normalizeId(value) {
   if (!value) return "";
@@ -157,7 +148,7 @@ function NotificationServes() {
       render: (text) =>
         text ? (
           <LinkCell type="button" onClick={() => handleLinkClick(text)}>
-            <LinkOutlined />
+            <ExternalLink size={14} />
             <span title={text}>{text}</span>
           </LinkCell>
         ) : (
@@ -186,28 +177,30 @@ function NotificationServes() {
       render: (_, record) => (
         <Space size={4}>
           <Tooltip title="View">
-            <Button
-              type="text"
-              icon={<EyeOutlined />}
-              onClick={() => handleView(record)}
-            />
+            <IconActionBtn type="button" title="View" onClick={() => handleView(record)}>
+              <Eye size={16} />
+            </IconActionBtn>
           </Tooltip>
           <Tooltip title="Edit">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
+            <IconActionBtn
+              type="button"
+              title="Edit"
               onClick={() =>
                 navigate(`/ServiceNotification/edit/${record._id}`)
               }
-            />
+            >
+              <Pencil size={16} />
+            </IconActionBtn>
           </Tooltip>
           <Tooltip title="Delete">
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
+            <IconActionBtn
+              type="button"
+              title="Delete"
+              $danger
               onClick={() => handleDelete(record._id)}
-            />
+            >
+              <Trash2 size={16} />
+            </IconActionBtn>
           </Tooltip>
         </Space>
       ),
@@ -217,73 +210,67 @@ function NotificationServes() {
 
   return (
     <NotificationWrapper>
-      <HeaderRow>
-        <div>
-          <Title level={3}>Our Services</Title>
-          <Text type="secondary">
-            Same list as the website Our Services menu.
-          </Text>
-        </div>
-        <Space wrap>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={fetchArticles}
-            loading={loading}
-          >
-            Refresh
-          </Button>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate("/ServiceNotification/add")}
-          >
-            Add service
-          </Button>
-        </Space>
-      </HeaderRow>
+      <PageHeader
+        title="Our Services"
+        breadcrumbs={[{ title: "Our Services" }]}
+        extra={
+          <Space wrap>
+            <Button
+              icon={<RefreshCw size={16} />}
+              onClick={fetchArticles}
+              loading={loading}
+            >
+              Refresh
+            </Button>
+            <Button
+              type="primary"
+              icon={<Plus size={16} />}
+              onClick={() => navigate("/ServiceNotification/add")}
+            >
+              Add service
+            </Button>
+          </Space>
+        }
+      />
+      <Text type="secondary" style={{ display: "block", marginTop: -8, marginBottom: 16 }}>
+        Same list as the website Our Services menu.
+      </Text>
 
-      <Toolbar>
-        <div className="search-box">
-          <Input
-            allowClear
-            size="large"
-            prefix={<SearchOutlined style={{ color: "#9aa3b5" }} />}
+      <DataTableShell
+        toolbar={[
+          <SearchBar
+            key="search"
             placeholder="Search title or link"
             value={searchText}
-            onChange={(e) => {
-              setSearchText(e.target.value);
+            onChange={(value) => {
+              setSearchText(value);
               setPage(1);
             }}
-          />
-        </div>
-        <CountText>
-          {filteredArticles.length} of {articles.length} services
-        </CountText>
-      </Toolbar>
-
-      <TableCard>
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          loading={loading}
-          rowKey="key"
-          pagination={{
-            current: page,
-            pageSize,
-            total: filteredArticles.length,
-            showTotal: (total, range) =>
-              `${range[0]}–${range[1]} of ${total}`,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50"],
-            onChange: (nextPage, nextSize) => {
-              setPage(nextPage);
-              setPageSize(nextSize);
-            },
-          }}
-          scroll={{ x: 720 }}
-          size="middle"
-        />
-      </TableCard>
+          />,
+          <CountText key="count">
+            {filteredArticles.length} of {articles.length} services
+          </CountText>,
+        ]}
+        columns={columns}
+        dataSource={dataSource}
+        loading={loading}
+        rowKey="key"
+        pagination={{
+          current: page,
+          pageSize,
+          total: filteredArticles.length,
+          showTotal: (total, range) =>
+            `${range[0]}–${range[1]} of ${total}`,
+          showSizeChanger: true,
+          pageSizeOptions: ["10", "20", "50"],
+          onChange: (nextPage, nextSize) => {
+            setPage(nextPage);
+            setPageSize(nextSize);
+          },
+        }}
+        scroll={{ x: 720 }}
+        emptyTitle="No services found"
+      />
 
       <Modal
         title="Service details"
@@ -296,7 +283,7 @@ function NotificationServes() {
           selectedArticle?.link ? (
             <Button
               type="primary"
-              icon={<LinkOutlined />}
+              icon={<ExternalLink size={16} />}
               onClick={() => handleLinkClick(selectedArticle.link)}
             >
               Open link

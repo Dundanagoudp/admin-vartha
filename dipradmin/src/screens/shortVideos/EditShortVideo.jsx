@@ -6,7 +6,6 @@ import {
   Button,
   Upload,
   message,
-  Card,
   Spin,
   Image,
   Row,
@@ -24,6 +23,8 @@ import {
 } from "../../service/ShortVideos/ShortVideoservice";
 import { getCategories } from "../../service/categories/CategoriesApi";
 import { uploadFileToAzureStorage } from "../../config/azurestorageservice";
+import PageHeader from "../../components/ui/PageHeader";
+import { FormCard } from "../../components/ui";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -245,8 +246,15 @@ function EditShortVideo() {
     );
 
   return (
-    <div style={{ padding: 24 }}>
-      <Card title="Edit Short Video">
+    <div>
+      <PageHeader
+        title="Edit Short Video"
+        breadcrumbs={[
+          { title: "Short Videos", path: "/manage-shortvideos" },
+          { title: "Edit Video" },
+        ]}
+      />
+      <FormCard>
         {previousVersion && (
           <div style={{ marginBottom: 16 }}>
             <Button
@@ -366,7 +374,7 @@ function EditShortVideo() {
             </Col>
           </Row>
         </Form>
-      </Card>
+      </FormCard>
     </div>
   );
 }

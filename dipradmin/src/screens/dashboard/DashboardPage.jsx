@@ -92,11 +92,6 @@ function DashboardPage() {
       {user && (
         <div className="profile-card">
           <div className="profile-left">
-            <img
-              src={user.profileImage || "/image.webp"}
-              alt="Profile"
-              className="profile-avatar"
-            />
             <div>
               <h3 className="profile-name">{user.displayName}</h3>
               <p className="profile-meta">

@@ -53,8 +53,13 @@ export const BrandTextWrap = styled.div`
 
   .brand-sub {
     color: #6b7280 !important;
-    font-size: 11px !important;
-    line-height: 1.3 !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block !important;
+    max-width: 100%;
   }
 `;
 

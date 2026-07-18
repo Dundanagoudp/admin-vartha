@@ -115,13 +115,8 @@ export default function TopNavbar({ onMenuClick }) {
         />
         <Dropdown menu={menu} trigger={["click"]}>
           <button type="button" className="tn-user">
-            <Avatar
-              size={36}
-              src={user?.profileImage || undefined}
-              style={{ background: "#005BAC" }}
-              icon={!user?.profileImage ? <User size={16} /> : undefined}
-            >
-              {!user?.profileImage ? initial : null}
+            <Avatar size={36} style={{ background: "#005BAC" }}>
+              {initial || <User size={16} />}
             </Avatar>
             <Space direction="vertical" size={0} className="tn-user-meta">
               <Text strong className="tn-name">

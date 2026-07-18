@@ -62,6 +62,7 @@ import PhotoCategoryPage from "./screens/photoCategory/PhotoCategoryPage.jsx";
 import AddDistrict from "./screens/districts/AddDistrict.jsx";
 import EditDistrict from "./screens/districts/EditDistrict.jsx";
 import DistrictsPage from "./screens/districts/DistrictsPage.jsx";
+import LiveTvPage from "./screens/liveTv/LiveTvPage.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -526,6 +527,15 @@ function App() {
               element={
                 <PrivateRoute>
                   <EditDistrict />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/live-tv"
+              element={
+                <PrivateRoute>
+                  <LiveTvPage />
                 </PrivateRoute>
               }
             />

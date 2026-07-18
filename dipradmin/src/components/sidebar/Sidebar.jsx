@@ -151,7 +151,7 @@ import { FaRegNewspaper } from "react-icons/fa";
 import { MdOutlineWebStories } from "react-icons/md";
 import { TbCategoryFilled } from "react-icons/tb";
 import { FaRegComments, FaFolderPlus } from "react-icons/fa";
-import { MdOutlineEditNotifications } from "react-icons/md";
+import { MdOutlineEditNotifications, MdLiveTv } from "react-icons/md";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -257,6 +257,10 @@ const Sidebar = () => {
 
             <Menu.Item key="/ServiceNotification" icon={<CommentOutlined />}>
               ServiceNotification
+            </Menu.Item>
+
+            <Menu.Item key="/live-tv" icon={<MdLiveTv />}>
+              Live TV
             </Menu.Item>
 
             {/* <Menu.Item key="/manage-notifications" icon={<VideoCameraAddOutlined />}>
